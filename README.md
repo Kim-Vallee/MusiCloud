@@ -25,7 +25,7 @@ The idea behind this website is to create a lightweight alternative to soundclou
 The idea would be to work with the following workflow:
 
 * SvelteKit
-* Better autho (to handle login and upload of files) [tutorial installation](https://better-auth.com/docs/installation), (tutorial github)[https://better-auth.com/docs/authentication/github], (tutorial sveltekit)[https://better-auth.com/docs/integrations/svelte-kit]
+* Better auth (to handle login and upload of files) [tutorial installation](https://better-auth.com/docs/installation), (tutorial github)[https://better-auth.com/docs/authentication/github], (tutorial sveltekit)[https://better-auth.com/docs/integrations/svelte-kit]
 * Tailwindcss (for the design)
 * SQLite (for storage of metadata) [tutorial](https://theofficialurban.medium.com/working-with-sqlite-in-sveltekit-9687e6eaf063)
 * Drizzle for the ORM (interface with the database) [tutorial](https://svelte.dev/docs/cli/drizzle) [tutorial2](https://fullstacksveltekit.com/blog/sveltekit-sqlite-drizzle)

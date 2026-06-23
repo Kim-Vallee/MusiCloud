@@ -1,10 +1,23 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
     import { authClient } from "$lib/client";
+    import { goto } from "$app/navigation";
 
     let { data }: PageProps = $props();
 
     const session = authClient.useSession();
+
+    async function handleGitHubSignIn() {
+        try {
+            await authClient.signIn.social({
+                provider: "github",
+            });
+        } catch (error) {
+            // Silently redirect on auth failure
+            goto("/");
+        }
+    }
+
 </script>
 
 <h1>Welcome to SvelteKit</h1>
@@ -28,11 +41,7 @@
         </div>
     {:else}
         <button
-            onclick={async () => {
-                await authClient.signIn.social({
-                    provider: "github",
-                });
-            }}
+            onclick={handleGitHubSignIn}
             style="background: red;"
         >
             Continue with GitHub
