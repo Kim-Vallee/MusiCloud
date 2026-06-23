@@ -5,7 +5,6 @@ export const music = sqliteTable('music', {
 	author: text('author').notNull().default('Tachyon'),
 	description: text('description'),
 	uploadedAt: integer('uploaded_at', { mode: 'timestamp'}).notNull().$defaultFn(() => new Date()),
-	createdAt: integer('created_at', { mode: 'timestamp'}).notNull().$defaultFn(() => new Date()),
 	bpm: integer('bpm'),
 	style: text('style'),
 	setup: text('setup'),

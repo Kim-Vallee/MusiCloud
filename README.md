@@ -25,7 +25,7 @@ The idea behind this website is to create a lightweight alternative to soundclou
 The idea would be to work with the following workflow:
 
 * SvelteKit
-* Auth.js (to handle login and upload of files) [tutorial](https://authjs.dev/reference/sveltekit)
+* Better autho (to handle login and upload of files) [tutorial installation](https://better-auth.com/docs/installation), (tutorial github)[https://better-auth.com/docs/authentication/github], (tutorial sveltekit)[https://better-auth.com/docs/integrations/svelte-kit]
 * Tailwindcss (for the design)
 * SQLite (for storage of metadata) [tutorial](https://theofficialurban.medium.com/working-with-sqlite-in-sveltekit-9687e6eaf063)
 * Drizzle for the ORM (interface with the database) [tutorial](https://svelte.dev/docs/cli/drizzle) [tutorial2](https://fullstacksveltekit.com/blog/sveltekit-sqlite-drizzle)
@@ -43,5 +43,19 @@ A fast forward, but not recommended option is to use `npm run db:push` which ign
 The general methods to access the db are in `src/lib/server/db/filename.ts` where filename corresponds to the object.
 
 ### Deploy
+
+First set the `.env` file with the following parameters:
+```
+# Drizzle
+DATABASE_URL=local.db
+
+# Better-auth
+BETTER_AUTH_SECRET=my_super_secret
+
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+```
+
+The better auth secret can be generated with the command `openssl rand -base64 32`. The better auth url should be changed according to the site as well.
 
 Look here to deploy the website: [adapter-node](https://svelte.dev/docs/kit/adapter-node).
