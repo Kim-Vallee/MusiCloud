@@ -3,23 +3,78 @@
     import { authClient } from "$lib/client";
     import { goto } from "$app/navigation";
 
+    import WaveSurfer from "wavesurfer.js";
+
+    import tdiheb from "$lib/audio/The Darkest Place I've Ever Been.mp3"
+
+
     let { data }: PageProps = $props();
     let searchQuery = $state("");
 
     const session = authClient.useSession();
 
-    // Sample sound data
-    const sounds = [
-        {
-            id: 1,
-            title: "Midnight Jazz",
-            author: "Alex Rivers",
-            uploadDate: "2024-06-10",
-            bpm: 120,
-            style: "Jazz",
-            duration: "3:45",
-        },
-        {
+    let wavesurfers = new Map<HTMLElement, WaveSurfer>();
+
+    function waveform(node: HTMLElement, audio: string) {
+        import('wavesurfer.js').then((module) => {
+            const WaveSurfer = module.default;
+
+            let wavesurfer = WaveSurfer.create({
+                container: node,
+                waveColor: '#9810FA',
+                progressColor: '#155DFC',
+                barWidth: 4,
+                barHeight: 0.8,
+                barRadius: 2
+            });
+
+            const parent = node.parentElement?.parentElement;
+            if (parent) wavesurfers.set(parent, wavesurfer);
+            else console.log('Error');
+
+            wavesurfer.load(audio);
+        })
+    }
+
+    function playPauseTrack(event: MouseEvent) {
+        let node = event.target;
+
+        if (node instanceof HTMLElement){
+            let parent = node.parentElement?.parentElement?.parentElement;
+
+            if (parent) {
+                let wavesurfer = wavesurfers.get(parent);
+                
+                // Pause all other instances
+                wavesurfers.forEach((ws: WaveSurfer, element, map) => {
+                    if (ws !== wavesurfer) {
+                            ws.pause();
+
+                            // Change button content
+                            element.getElementsByTagName("button")[0].innerHTML = "Play";
+                    } 
+                    });
+                    
+                    // Start the new instance
+                    wavesurfer?.playPause();
+                    if (node?.innerHTML.trim() === "Play") node.innerHTML = "Pause";
+                    else node.innerHTML = "Play";
+                }
+            }
+        }
+
+        // Sample sound data
+        const sounds = [
+            {
+                id: 1,
+                title: "Midnight Jazz",
+                author: "Alex Rivers",
+                uploadDate: "2024-06-10",
+                bpm: 120,
+                style: "Jazz",
+                duration: "3:45",
+            },
+            {
             id: 2,
             title: "Ambient Waves",
             author: "Luna Echo",
@@ -116,15 +171,19 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 py-12">
         <!-- Sounds Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-6">
             {#each sounds as sound (sound.id)}
                 <div
                     class="bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/20 overflow-hidden group"
                 >
                     <!-- Card Header -->
-                    <div class="h-32 bg-gradient-to-br from-blue-600 to-purple-600 relative overflow-hidden">
+                    <div class="h-32 relative overflow-hidden">
+                        <div>
+
+                        </div>
                         <div
-                            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/20"
+                            use:waveform="{tdiheb}"
+                            class="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity bg-black/20"
                         ></div>
                     </div>
 
@@ -167,6 +226,7 @@
                         <!-- Actions -->
                         <div class="flex gap-2">
                             <button
+                                onclick={playPauseTrack}
                                 class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
                             >
                                 Play
