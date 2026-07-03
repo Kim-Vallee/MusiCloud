@@ -13,11 +13,11 @@ export const auth = betterAuth({
     plugins: [sveltekitCookies(getRequestEvent)],
     baseURL: BETTER_AUTH_URL as string,
     callbacks: {
-        async signIn({ user, account }) {
+        async signIn({ user, account }: { user: { email?: string | null }; account?: { provider?: string } }) {
             // Only allow specific GitHub usernames
             if (account?.provider === "github") {
                 const email = user.email;
-                if (!ALLOWED_GITHUB_EMAILS.includes(email)) {
+                if (!ALLOWED_GITHUB_EMAILS.includes(email ?? "")) {
                     return false; // Reject sign-in silently
                 }
             }
