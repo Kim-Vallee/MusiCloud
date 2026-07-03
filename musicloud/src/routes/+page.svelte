@@ -10,6 +10,7 @@
 
     let { data }: PageProps = $props();
     let searchQuery = $state("");
+    let activeTrackId: number | null = $state(null);
 
     const session = authClient.useSession();
 
@@ -36,32 +37,29 @@
         })
     }
 
-    function playPauseTrack(event: MouseEvent) {
-        let node = event.target;
+    function playPauseTrack(soundId: number, event: MouseEvent) {
+        const button = event.currentTarget as HTMLElement;
+        const parent = button.closest(".group") as HTMLElement;
+        if (!parent) return;
 
-        if (node instanceof HTMLElement){
-            let parent = node.parentElement?.parentElement?.parentElement;
+        let wavesurfer = wavesurfers.get(parent);
+        if (!wavesurfer) return;
 
-            if (parent) {
-                let wavesurfer = wavesurfers.get(parent);
-                
-                // Pause all other instances
-                wavesurfers.forEach((ws: WaveSurfer, element, map) => {
-                    if (ws !== wavesurfer) {
-                            ws.pause();
-
-                            // Change button content
-                            element.getElementsByTagName("button")[0].innerHTML = "Play";
-                    } 
-                    });
-                    
-                    // Start the new instance
-                    wavesurfer?.playPause();
-                    if (node?.innerHTML.trim() === "Play") node.innerHTML = "Pause";
-                    else node.innerHTML = "Play";
-                }
-            }
+        if (wavesurfer.isPlaying()) {
+            wavesurfer.pause();
+            activeTrackId = null;
+            return;
         }
+
+        wavesurfers.forEach((ws: WaveSurfer) => {
+            if (ws !== wavesurfer && ws.isPlaying()) {
+                ws.pause();
+            }
+        });
+
+        wavesurfer.play();
+        activeTrackId = soundId;
+    }
 
         // Sample sound data
         const sounds = [
@@ -189,52 +187,56 @@
 
                     <!-- Card Content -->
                     <div class="p-5">
-                        <h3 class="text-lg font-bold text-white mb-1 truncate">
-                            {sound.title}
-                        </h3>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                            <div class="min-w-0">
+                                <h3 class="text-lg font-bold text-white truncate">
+                                    {sound.title}
+                                </h3>
+                                <p class="text-sm text-gray-400 truncate">
+                                    by {sound.author}
+                                </p>
+                            </div>
 
-                        <p class="text-sm text-gray-400 mb-4 truncate">
-                            by {sound.author}
-                        </p>
-
-                        <!-- Tags -->
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span
-                                class="text-xs px-2.5 py-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
-                            >
-                                {sound.style}
-                            </span>
-                            <span
-                                class="text-xs px-2.5 py-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50"
-                            >
-                                {sound.bpm} BPM
-                            </span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-[11px] px-2 py-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50">
+                                    {sound.style}
+                                </span>
+                                <span class="text-[11px] px-2 py-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50">
+                                    {sound.bpm} BPM
+                                </span>
+                            </div>
                         </div>
 
-                        <!-- Info Grid -->
-                        <div class="space-y-2 mb-4 pb-4 border-t border-gray-700 pt-4">
-                            <div class="flex justify-between text-xs text-gray-400">
-                                <span>Duration</span>
-                                <span class="text-gray-200">{sound.duration}</span>
-                            </div>
-                            <div class="flex justify-between text-xs text-gray-400">
-                                <span>Uploaded</span>
-                                <span class="text-gray-200">{sound.uploadDate}</span>
+                        <!-- Info -->
+                        <div class="mb-3 border-t border-gray-700 pt-3 text-xs text-gray-400">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <span>Duration</span>
+                                    <span class="text-gray-200">{sound.duration}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span>Uploaded</span>
+                                    <span class="text-gray-200">{sound.uploadDate}</span>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Actions -->
-                        <div class="flex gap-2">
+                        <div class="flex justify-center">
                             <button
-                                onclick={playPauseTrack}
-                                class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                onclick={(event) => playPauseTrack(sound.id, event)}
+                                class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+                                aria-label="Play or pause track"
                             >
-                                Play
-                            </button>
-                            <button
-                                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
-                            >
-                                ♡
+                                {#if activeTrackId === sound.id}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 pointer-events-none">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 5h4v14H6V5zm8 0h4v14h-4V5z" />
+                                    </svg>
+                                {:else}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 pointer-events-none">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                                    </svg>
+                                {/if}
                             </button>
                         </div>
                     </div>
