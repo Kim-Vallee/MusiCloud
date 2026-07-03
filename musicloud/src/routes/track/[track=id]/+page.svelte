@@ -60,12 +60,12 @@
     }
 </script>
 
-<div class="min-h-screen flex bg-gray-950">
-    <main class="w-full h-full px-6 py-12">
+<div class="min-h-screen flex flex-col bg-gray-950">
+    <main class="w-full px-6 py-12 flex-1 flex flex-col">
         <div
-            class="h-full bg-gray-800 rounded-3xl border border-gray-700 shadow-xl overflow-hidden"
+            class="flex-1 flex bg-gray-800 rounded-3xl border border-gray-700 shadow-xl overflow-hidden"
         >
-            <div class="p-8">
+            <div class="flex flex-col flex-1 p-8">
                 <a
                     href="/"
                     class="text-sm text-blue-300 hover:text-white transition-colors"
@@ -143,20 +143,20 @@
                     </div>
                 </div>
 
-                <div class="mt-4 flex flex-col md:flex-row gap-6">
+                <div class="mt-4 flex grow flex-col md:flex-row gap-6">
                     <div
-                        class="rounded-2xl bg-gray-900 border border-gray-700 p-5 basis-1 md:basis-2/3"
+                        class="relative rounded-2xl bg-gray-900 border border-gray-700 p-5 basis-1 md:basis-2/3"
                     >
                         <h3
                             class="text-sm font-semibold text-white uppercase tracking-[0.2em] text-gray-300"
                         >
                             Description
                         </h3>
-                        <p class="mt-3 text-sm leading-6 text-gray-300">
+                        <p class="mt-3 text-sm leading-6 text-gray-300 mb-5">
                             {track.description}
                         </p>
 
-                        <div class="flex flex-wrap items-center gap-2 mt-3">
+                        <div class="flex flex-wrap items-center gap-2">
                             {#each track.tags as tag}
                                 <span
                                     class="text-[11px] px-3 py-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
