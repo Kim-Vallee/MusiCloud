@@ -136,9 +136,11 @@
 </script>
 
 <div class="min-h-screen bg-gray-950">
-    <!-- Header with Search -->
-    <div class="bg-gray-900 border-b border-gray-800 sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-6">
+        
+        <div class="mx-auto py-8">
             <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
 
             <!-- Search Bar -->
@@ -164,10 +166,6 @@
                 </svg>
             </div>
         </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-6 py-12">
         <!-- Sounds Grid -->
         <div class="grid grid-cols-1 gap-6">
             {#each sounds as sound (sound.id)}
@@ -176,9 +174,6 @@
                 >
                     <!-- Card Header -->
                     <div class="h-32 relative overflow-hidden">
-                        <div>
-
-                        </div>
                         <div
                             use:waveform="{tdiheb}"
                             class="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity bg-black/20"
@@ -189,9 +184,9 @@
                     <div class="p-5">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                             <div class="min-w-0">
-                                <h3 class="text-lg font-bold text-white truncate">
+                                <a href="/track/{sound.id}" class="text-lg font-bold text-white truncate">
                                     {sound.title}
-                                </h3>
+                                </a>
                                 <p class="text-sm text-gray-400 truncate">
                                     by {sound.author}
                                 </p>
