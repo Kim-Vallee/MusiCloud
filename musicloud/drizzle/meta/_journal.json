@@ -15,6 +15,13 @@
       "when": 1782204611368,
       "tag": "0001_lying_kylun",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783532224237,
+      "tag": "0002_common_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

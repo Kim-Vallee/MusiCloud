@@ -13,6 +13,8 @@
     let activeTrackId: number | null = $state(null);
 
     const session = authClient.useSession();
+    const isAuthenticated = $derived(Boolean($session.data?.user));
+    const userName = $derived($session.data?.user?.name ?? $session.data?.user?.email ?? "");
 
     let wavesurfers = new Map<HTMLElement, WaveSurfer>();
 
@@ -143,6 +145,7 @@
         <div class="mx-auto py-8">
             <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
 
+
             <!-- Search Bar -->
             <div class="relative">
                 <input
@@ -168,6 +171,15 @@
         </div>
         <!-- Sounds Grid -->
         <div class="grid grid-cols-1 gap-6">
+
+            {#if isAuthenticated}
+                <a
+                    href="/admin/add"
+                    class="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-600 bg-gray-800/70 p-6 text-center text-sm font-medium text-gray-300 transition-all hover:border-blue-500 hover:text-white hover:shadow-lg hover:shadow-blue-500/20"
+                >
+                    add track
+                </a>
+            {/if}
             {#each sounds as sound (sound.id)}
                 <div
                     class="bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/20 overflow-hidden group"
