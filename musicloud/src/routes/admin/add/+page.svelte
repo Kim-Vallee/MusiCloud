@@ -52,7 +52,7 @@
 
                     <label class="block text-sm font-medium text-gray-300">
                         <span class="mb-2 block">Styles</span>
-                        <input name="styles" placeholder="Jazz" class={inputClasses} />
+                        <input name="styles" placeholder="Métal,Thrash métal" class={inputClasses} />
                     </label>
 
                     <label class="block text-sm font-medium text-gray-300 md:col-span-2">
