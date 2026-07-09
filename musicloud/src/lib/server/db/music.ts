@@ -5,7 +5,6 @@ import { eq, like, and, sql, gte, lte } from "drizzle-orm";
 export const getAllMusics = () => db.select().from(music).all();
 export const getMusicsByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
 export const getMusicsByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
-export const getMusicsByStyle = (style: string) => db.select().from(music).where(eq(music.style, style)).all();
 export const getMusicsByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
 
 export const createTrack = async (input: {
@@ -14,12 +13,13 @@ export const createTrack = async (input: {
     description?: string | null;
     uploadedAt?: Date | null;
     bpm?: number | null;
-    style?: string | null;
+    styles?: string[] | null;
     setup?: string | null;
     tags?: string[] | null;
     audioFile?: string | null;
 }) => {
     const tags = input.tags?.filter(Boolean) ?? [];
+    const styles = input.styles?.filter(Boolean) ?? [];
 
     return db.insert(music).values({
         title: input.title.trim(),
@@ -27,7 +27,7 @@ export const createTrack = async (input: {
         description: input.description?.trim() || null,
         uploadedAt: input.uploadedAt ?? new Date(),
         bpm: input.bpm ?? null,
-        style: input.style?.trim() || null,
+        styles,
         setup: input.setup?.trim() || null,
         tags,
         audioFile: input.audioFile?.trim() || null,

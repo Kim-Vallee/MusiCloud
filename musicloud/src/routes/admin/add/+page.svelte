@@ -37,22 +37,22 @@
 
                     <label class="block text-sm font-medium text-gray-300">
                         <span class="mb-2 block">Author</span>
-                        <input name="author" placeholder="Alex Rivers" class={inputClasses} />
+                        <input name="author" required placeholder="Alex Rivers" class={inputClasses} />
                     </label>
 
                     <label class="block text-sm font-medium text-gray-300 md:col-span-2">
                         <span class="mb-2 block">Description</span>
-                        <textarea name="description" rows="4" placeholder="What makes this track special?" class={inputClasses}></textarea>
+                        <textarea name="description" required rows="4" placeholder="What makes this track special?" class={inputClasses}></textarea>
                     </label>
 
                     <label class="block text-sm font-medium text-gray-300">
                         <span class="mb-2 block">BPM</span>
-                        <input name="bpm" type="number" min="40" max="220" placeholder="120" class={inputClasses} />
+                        <input name="bpm" type="number" min="20" max="320" placeholder="120" class={inputClasses} />
                     </label>
 
                     <label class="block text-sm font-medium text-gray-300">
-                        <span class="mb-2 block">Style</span>
-                        <input name="style" placeholder="Jazz" class={inputClasses} />
+                        <span class="mb-2 block">Styles</span>
+                        <input name="styles" placeholder="Jazz" class={inputClasses} />
                     </label>
 
                     <label class="block text-sm font-medium text-gray-300 md:col-span-2">

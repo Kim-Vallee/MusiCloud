@@ -23,7 +23,7 @@ export const actions: Actions = {
         const description = String(formData.get('description') ?? '').trim();
         const uploadedAt = String(formData.get('uploadedAt') ?? '').trim();
         const bpm = String(formData.get('bpm') ?? '').trim();
-        const style = String(formData.get('style') ?? '').trim();
+        const styles = String(formData.get('styles') ?? '').trim();
         const setup = String(formData.get('setup') ?? '').trim();
         const tags = String(formData.get('tags') ?? '').trim();
         const audioFile = formData.get('audioFile');
@@ -54,7 +54,10 @@ export const actions: Actions = {
                 description: description || null,
                 uploadedAt: uploadedAt ? new Date(uploadedAt) : null,
                 bpm: bpm ? Number(bpm) : null,
-                style: style || null,
+                styles: styles
+                            .split(',')
+                            .map((tag) => tag.trim())
+                            .filter(Boolean),
                 setup: setup || null,
                 tags: tags
                     .split(',')
