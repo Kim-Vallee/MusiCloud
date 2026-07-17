@@ -1,7 +1,8 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const music = sqliteTable('music', {
-	title: text('title').primaryKey(),
+	id: integer('id').primaryKey(),
+	title: text('title').notNull(),
 	author: text('author').notNull().default('Tachyon'),
 	description: text('description'),
 	uploadedAt: integer('uploaded_at', { mode: 'timestamp'}).notNull().$defaultFn(() => new Date()),
@@ -9,5 +10,6 @@ export const music = sqliteTable('music', {
 	styles: text('style', { mode: 'json' }).$type<string[]>(),
 	setup: text('setup'),
 	tags: text('tags', { mode: 'json' }).$type<string[]>(),
-	audioFile: text('audio_file')
+	audioFile: text('audio_file'),
+	duration: integer('duration', {mode: 'timestamp'}).notNull(),
 })

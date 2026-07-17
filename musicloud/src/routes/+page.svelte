@@ -1,26 +1,32 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
-    import { authClient } from "$lib/client";
-    import { goto } from "$app/navigation";
+    import dateFormat from "dateformat";
 
     import WaveSurfer from "wavesurfer.js";
 
-    import tdiheb from "$lib/audio/The Darkest Place I've Ever Been.mp3"
-
+    const audioAssets = import.meta.glob("../lib/audio/*.{mp3,wav,ogg}", {
+        eager: true,
+        import: "default",
+    }) as Record<string, string>;
 
     let { data }: PageProps = $props();
     let searchQuery = $state("");
     let activeTrackId: number | null = $state(null);
 
-    const session = authClient.useSession();
-    const isAuthenticated = $derived(Boolean($session.data?.user));
-    const userName = $derived($session.data?.user?.name ?? $session.data?.user?.email ?? "");
+    const isAuthenticated = $derived(Boolean(data.isAuthenticated));
 
     let wavesurfers = new Map<HTMLElement, WaveSurfer>();
+
+    function getAudioUrl(audioFile: string | null) {
+        if (!audioFile) return "";
+        return audioAssets[`../lib/audio/${audioFile}`] ?? "";
+    }
 
     function waveform(node: HTMLElement, audio: string) {
         import('wavesurfer.js').then((module) => {
             const WaveSurfer = module.default;
+
+            if (!audio) return;
 
             let wavesurfer = WaveSurfer.create({
                 container: node,
@@ -63,78 +69,9 @@
         activeTrackId = soundId;
     }
 
-        // Sample sound data
-        const sounds = [
-            {
-                id: 1,
-                title: "Midnight Jazz",
-                author: "Alex Rivers",
-                uploadDate: "2024-06-10",
-                bpm: 120,
-                style: "Jazz",
-                duration: "3:45",
-            },
-            {
-            id: 2,
-            title: "Ambient Waves",
-            author: "Luna Echo",
-            uploadDate: "2024-06-15",
-            bpm: 80,
-            style: "Ambient",
-            duration: "5:20",
-        },
-        {
-            id: 3,
-            title: "Electric Dreams",
-            author: "Synth Master",
-            uploadDate: "2024-06-20",
-            bpm: 130,
-            style: "Synthwave",
-            duration: "4:10",
-        },
-        {
-            id: 4,
-            title: "Soul Deep",
-            author: "Deep Grooves",
-            uploadDate: "2024-06-12",
-            bpm: 95,
-            style: "Soul",
-            duration: "3:55",
-        },
-        {
-            id: 5,
-            title: "Neon Nights",
-            author: "City Lights",
-            uploadDate: "2024-06-18",
-            bpm: 140,
-            style: "Electronic",
-            duration: "4:30",
-        },
-        {
-            id: 6,
-            title: "Forest Whispers",
-            author: "Nature Sounds",
-            uploadDate: "2024-06-22",
-            bpm: 70,
-            style: "Ambient",
-            duration: "6:00",
-        },
-    ];
-
     $effect(() => {
         // Filter sounds based on search query
     });
-
-    async function handleGitHubSignIn() {
-        try {
-            await authClient.signIn.social({
-                provider: "github",
-            });
-        } catch (error) {
-            // Silently redirect on auth failure
-            goto("/");
-        }
-    }
 </script>
 
 <div class="min-h-screen bg-gray-950">
@@ -151,7 +88,7 @@
                 <input
                     type="text"
                     bind:value={searchQuery}
-                    placeholder="Search sounds by title, artist, or style..."
+                    placeholder="Search tracks by title, artist, or style..."
                     class="w-full px-4 py-3 pl-12 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 transition-all"
                 />
                 <svg
@@ -169,7 +106,7 @@
                 </svg>
             </div>
         </div>
-        <!-- Sounds Grid -->
+        <!-- Tracks Grid -->
         <div class="grid grid-cols-1 gap-6">
 
             {#if isAuthenticated}
@@ -180,14 +117,14 @@
                     Add track
                 </a>
             {/if}
-            {#each sounds as sound (sound.id)}
+            {#each data.tracks as track (track.id)}
                 <div
                     class="bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/20 overflow-hidden group"
                 >
                     <!-- Card Header -->
                     <div class="h-32 relative overflow-hidden">
                         <div
-                            use:waveform="{tdiheb}"
+                            use:waveform={getAudioUrl(track.audioFile)}
                             class="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity bg-black/20"
                         ></div>
                     </div>
@@ -196,21 +133,20 @@
                     <div class="p-5">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                             <div class="min-w-0">
-                                <a href="/track/{sound.id}" class="text-lg font-bold text-white truncate">
-                                    {sound.title}
+                                <a href="/track/{track.id}" class="text-lg font-bold text-white truncate">
+                                    {track.title}
                                 </a>
                                 <p class="text-sm text-gray-400 truncate">
-                                    by {sound.author}
+                                    by {track.author}
                                 </p>
                             </div>
 
                             <div class="flex flex-wrap items-center gap-2">
+                            {#each track.tags as tag}
                                 <span class="text-[11px] px-2 py-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50">
-                                    {sound.style}
+                                    {tag}
                                 </span>
-                                <span class="text-[11px] px-2 py-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50">
-                                    {sound.bpm} BPM
-                                </span>
+                            {/each}
                             </div>
                         </div>
 
@@ -219,11 +155,19 @@
                             <div class="flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2">
                                     <span>Duration</span>
-                                    <span class="text-gray-200">{sound.duration}</span>
+                                    <span class="text-gray-200">{dateFormat(track.duration, "mm:ss")}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span>Styles</span>
+                                    <span class="text-gray-200">{track.styles}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span>BPM</span>
+                                    <span class="text-gray-200">{track.bpm}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span>Uploaded</span>
-                                    <span class="text-gray-200">{sound.uploadDate}</span>
+                                    <span class="text-gray-200">{track.uploadedAt.toDateString()}</span>
                                 </div>
                             </div>
                         </div>
@@ -231,11 +175,11 @@
                         <!-- Actions -->
                         <div class="flex justify-center">
                             <button
-                                onclick={(event) => playPauseTrack(sound.id, event)}
+                                onclick={(event) => playPauseTrack(track.id, event)}
                                 class="inline-flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
                                 aria-label="Play or pause track"
                             >
-                                {#if activeTrackId === sound.id}
+                                {#if activeTrackId === track.id}
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 pointer-events-none">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 5h4v14H6V5zm8 0h4v14h-4V5z" />
                                     </svg>

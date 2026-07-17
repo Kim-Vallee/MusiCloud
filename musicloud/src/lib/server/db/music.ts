@@ -2,14 +2,14 @@ import { db } from ".";
 import { music } from "./schema";
 import { eq, like, and, sql, gte, lte } from "drizzle-orm";
 
-export const getAllMusics = () => db.select().from(music).all();
-export const getMusicsByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
-export const getMusicsByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
-export const getMusicsByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
+export const getAllTracks = () => db.select().from(music).all();
+export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
+export const getTrackByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
+export const getTrackByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
 
 export const createTrack = async (input: {
     title: string;
-    author?: string | null;
+    author: string;
     description?: string | null;
     uploadedAt?: Date | null;
     bpm?: number | null;
@@ -17,6 +17,7 @@ export const createTrack = async (input: {
     setup?: string | null;
     tags?: string[] | null;
     audioFile?: string | null;
+    duration: Date;
 }) => {
     const tags = input.tags?.filter(Boolean) ?? [];
     const styles = input.styles?.filter(Boolean) ?? [];
@@ -31,10 +32,11 @@ export const createTrack = async (input: {
         setup: input.setup?.trim() || null,
         tags,
         audioFile: input.audioFile?.trim() || null,
+        duration: input.duration,
     }).run();
 };
 
-export const getMusicsByTags = (tags: string) => {
+export const getTracksByTags = (tags: string) => {
     const array_tags = tags
         .split(',')
         .map((t) => t.trim())
@@ -49,6 +51,6 @@ export const getMusicsByTags = (tags: string) => {
     return db.select().from(music).where(and(...conditions)).all();
 }
 
-export const getMusicsByDates = (start_date: Date, end_date: Date) => {
+export const getTracksByDates = (start_date: Date, end_date: Date) => {
     return db.select().from(music).where(and(gte(music.uploadedAt, start_date), lte(music.uploadedAt, end_date))).all();
 }

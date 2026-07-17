@@ -1,10 +1,11 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { createTrack } from '$lib/server/db/music';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { file } from 'better-auth';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
@@ -35,16 +36,22 @@ export const actions: Actions = {
             return fail(400, { error: 'Title is required.' });
         }
 
-        try {
-            let audioFileName: string | null = null;
-            
-            console.log(audioFile);
-            console.log(audioFile instanceof File);
+        if (!author) {
+            return fail(400, { error: 'Author is required.' });
+        }
 
+        if (!audioFile) {
+            return fail(400, {error: 'File is required. '}); 
+        }
+
+        let audioFileName: string | null = null;
+        let filePath: string | null = null;
+
+        try {
             if (audioFile && audioFile instanceof File && audioFile.size > 0) {
                 const extension = audioFile.name.split('.').pop() ?? "";
                 if (!fileTypes.includes(extension)) {
-                    return fail(500, { error: 'Unknown extension, allowed extensions are wav, mp3, ogg and m4a.'});
+                    return fail(400, { error: 'Unknown extension, allowed extensions are wav, mp3, ogg and m4a.'});
                 }
                 const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'track';
                 const uniqueSuffix = Math.random().toString(16).slice(2, 10);
@@ -52,33 +59,65 @@ export const actions: Actions = {
 
                 const audioDir = join(fileURLToPath(new URL('../../../lib/audio', import.meta.url)));
                 await mkdir(audioDir, { recursive: true });
-                const filePath = join(audioDir, audioFileName);
+                filePath = join(audioDir, audioFileName);
                 const bytes = await audioFile.arrayBuffer();
-                console.log(filePath);
                 await writeFile(filePath, Buffer.from(bytes));
             }
+        } catch (err) {
+            console.log(err);
+            return fail(500, { error: "Failed to save file."})
+        }
 
-            // await createTrack({
-            //     title,
-            //     author: author || null,
-            //     description: description || null,
-            //     uploadedAt: uploadedAt ? new Date(uploadedAt) : null,
-            //     bpm: bpm ? Number(bpm) : null,
-            //     styles: styles
-            //                 .split(',')
-            //                 .map((tag) => tag.trim())
-            //                 .filter(Boolean),
-            //     setup: setup || null,
-            //     tags: tags
-            //         .split(',')
-            //         .map((tag) => tag.trim())
-            //         .filter(Boolean),
-            //     audioFile: audioFileName,
-            // });
+        // Get duration
+        const execFileAsync = promisify(execFile);
+        let duration = new Date(0);
+
+        try {
+            if (!filePath) {
+                return fail(500, { error: "FilePath incorrectly defined" });
+            }
+            const { stdout } = await execFileAsync('ffprobe', [
+                '-v', 'error',
+                '-show_entries', 'format=duration',
+                '-of', 'default=noprint_wrappers=1:nokey=1',
+                filePath,
+            ]);
+
+            const seconds = Number.parseFloat(stdout.trim());
+            if (!Number.isNaN(seconds) && seconds > 0) {
+                duration = new Date(Math.round(seconds * 1000));
+            }
+        } catch (err) {
+            console.log(err);
+            return fail(500, "error while computing the duration");
+        }
+        
+
+        try {
+            await createTrack({
+                title,
+                author,
+                description: description || null,
+                uploadedAt: uploadedAt ? new Date(uploadedAt) : null,
+                bpm: bpm ? Number(bpm) : null,
+                styles: styles
+                            .split(',')
+                            .map((tag) => tag.trim())
+                            .filter(Boolean),
+                setup: setup || null,
+                tags: tags
+                    .split(',')
+                    .map((tag) => tag.trim())
+                    .filter(Boolean),
+                audioFile: audioFileName,
+                duration
+            });
 
             return { success: true, message: 'Track added successfully.' };
         } catch (err) {
-            console.error(err);
+            console.log(err);
+            // Delete saved file:
+            if (filePath) await rm(filePath);
             return fail(500, { error: 'Unable to add the track right now.' });
         }
     },
