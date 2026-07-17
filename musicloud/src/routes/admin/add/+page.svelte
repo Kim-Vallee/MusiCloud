@@ -28,7 +28,7 @@
                 </div>
             {/if}
 
-            <form method="POST" class="space-y-6" action="?/add_track">
+            <form method="POST" class="space-y-6" action="?/add_track" enctype="multipart/form-data">
                 <div class="grid gap-6 md:grid-cols-2">
                     <label class="block text-sm font-medium text-gray-300">
                         <span class="mb-2 block">Title</span>
