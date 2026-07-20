@@ -11,5 +11,5 @@ export const music = sqliteTable('music', {
 	setup: text('setup'),
 	tags: text('tags', { mode: 'json' }).$type<string[]>(),
 	audioFile: text('audio_file'),
-	duration: integer('duration', {mode: 'timestamp'}).notNull(),
+	duration: integer('duration').notNull().default(0),
 })

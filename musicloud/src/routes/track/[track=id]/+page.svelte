@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import tdiheb from "$lib/audio/The Darkest Place I've Ever Been.mp3";
     import type WaveSurfer from "wavesurfer.js";
 

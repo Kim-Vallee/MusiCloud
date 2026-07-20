@@ -17,7 +17,7 @@ export const createTrack = async (input: {
     setup?: string | null;
     tags?: string[] | null;
     audioFile?: string | null;
-    duration: Date;
+    duration: number;
 }) => {
     const tags = input.tags?.filter(Boolean) ?? [];
     const styles = input.styles?.filter(Boolean) ?? [];

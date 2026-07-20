@@ -155,7 +155,8 @@
                             <div class="flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2">
                                     <span>Duration</span>
-                                    <span class="text-gray-200">{dateFormat(track.duration, "mm:ss")}</span>
+                                    <!-- <span class="text-gray-200">{dateFormat(track.duration, "mm:ss")}</span> -->
+                                    <span class="text-gray-200">{Math.floor(track.duration / 60) }:{track.duration % 60}</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span>Styles</span>

@@ -70,7 +70,7 @@ export const actions: Actions = {
 
         // Get duration
         const execFileAsync = promisify(execFile);
-        let duration = new Date(0);
+        let duration = 0;
 
         try {
             if (!filePath) {
@@ -85,11 +85,13 @@ export const actions: Actions = {
 
             const seconds = Number.parseFloat(stdout.trim());
             if (!Number.isNaN(seconds) && seconds > 0) {
-                duration = new Date(Math.round(seconds * 1000));
+                duration = seconds;
+            } else {
+                return fail(500, "Internal error while computing the duration")
             }
         } catch (err) {
             console.log(err);
-            return fail(500, "error while computing the duration");
+            return fail(500, "Internal error while computing the duration");
         }
         
 
