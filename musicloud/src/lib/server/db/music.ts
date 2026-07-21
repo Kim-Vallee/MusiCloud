@@ -8,6 +8,15 @@ export const getTrackByAuthor = (author: string) => db.select().from(music).wher
 export const getTrackByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
 export const getTrackById = (id: number) => db.select().from(music).where(eq(music.id, id)).all()[0] ?? null;
 
+export const deleteTrackById = async (id: number) => {
+    const track = await db.delete(music).where(eq(music.id, id)).returning();
+    if (!track) {
+        return false;
+    }
+    return track;
+
+}
+
 export const createTrack = async (input: {
     title: string;
     author: string;

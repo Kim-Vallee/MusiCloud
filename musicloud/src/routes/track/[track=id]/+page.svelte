@@ -140,16 +140,6 @@
                         <p class="mt-3 text-sm leading-6 text-gray-300 mb-5">
                             {data.track.description}
                         </p>
-
-                        <div class="flex flex-wrap items-center gap-2">
-                            {#each data.track.tags as tag}
-                                <span
-                                    class="text-[11px] px-3 py-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
-                                >
-                                    {tag}
-                                </span>
-                            {/each}
-                        </div>
                     </div>
                     <div class="flex flex-col basis-1 md:basis-1/3 gap-3">
                         <div
@@ -164,28 +154,29 @@
                                 <div class="">BPM: {data.track.bpm}</div>
                                 <div class="mt-2">
                                     Duration:
-                                    {Math.floor(
-                                        data.track.duration / 60,
-                                    )}:{data.track.duration % 60}
+                                    {Math.floor(data.track.duration / 60)}:{data
+                                        .track.duration % 60}
                                 </div>
                                 <div class="mt-2">
-                                    Upload date: {formatDate(data.track.uploadedAt)}
+                                    Upload date: {formatDate(
+                                        data.track.uploadedAt,
+                                    )}
                                 </div>
                                 <div class="mt-2">
-                                    Styles: <br />
+                                    Styles:
                                     {#each data.track.styles as style}
                                         <span
-                                            class="text-[11px] px-3 py-1 mx-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50"
+                                            class="text-[11px] px-2 py-1 mx-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50"
                                         >
                                             {style}
                                         </span>
                                     {/each}
                                 </div>
                                 <div class="mt-2">
-                                    Tags: <br />
+                                    Tags:
                                     {#each data.track.tags as tag}
                                         <span
-                                            class="text-[11px] px-3 py-1 mx-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
+                                            class="text-[11px] px-2 py-1 mx-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
                                         >
                                             {tag}
                                         </span>
