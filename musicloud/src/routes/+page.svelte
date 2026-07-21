@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { PageProps } from "./$types";
-    import dateFormat from "dateformat";
 
     import WaveSurfer from "wavesurfer.js";
 

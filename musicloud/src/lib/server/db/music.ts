@@ -6,6 +6,7 @@ export const getAllTracks = () => db.select().from(music).all();
 export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
 export const getTrackByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
 export const getTrackByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
+export const getTrackById = (id: number) => db.select().from(music).where(eq(music.id, id)).all()[0] ?? null;
 
 export const createTrack = async (input: {
     title: string;
