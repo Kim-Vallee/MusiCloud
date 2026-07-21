@@ -1,5 +1,6 @@
 <script lang="ts">
-    import type { PageProps } from "./$types";
+    import type { PageData } from "./$types";
+    import type { ActionData } from "./admin/delete/$types";
 
     import WaveSurfer from "wavesurfer.js";
 
@@ -8,11 +9,12 @@
         import: "default",
     }) as Record<string, string>;
 
-    let { data }: PageProps = $props();
+    let { data }: { data: PageData; form: ActionData } = $props();
     let searchQuery = $state("");
     let activeTrackId: number | null = $state(null);
     let showDeleteModal = $state(false);
     let trackToDelete: { id: number; title: string } | null = $state(null);
+    let trackDeleted = $state(null);
 
     const isAuthenticated = $derived(Boolean(data.isAuthenticated));
 
@@ -80,6 +82,28 @@
         trackToDelete = null;
     }
 
+    async function deleteTrack() {
+        const response = await fetch("/admin/delete", {
+            method: "POST",
+            body: JSON.stringify({ trackId: trackToDelete?.id }),
+            headers: {
+                "content-type": "application/json",
+            },
+        });
+
+        trackDeleted = await response.json();
+
+        if (trackDeleted) {
+            document.getElementById(`track-id-${trackDeleted.id}`)?.remove();
+            setTimeout(() => {
+                trackDeleted = null;
+            }, 5000)
+        }
+
+
+        closeDeleteModal();
+    }
+
     $effect(() => {
         // Filter sounds based on search query
     });
@@ -89,6 +113,13 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 py-6">
         <div class="mx-auto py-8">
+            {#if isAuthenticated && trackDeleted}
+                <div
+                    class="fixed right-4 top-4 z-50 max-w-sm rounded-xl border border-green-500/40 bg-green-950/95 px-4 py-3 text-sm text-red-100 shadow-lg shadow-black/30 backdrop-blur"
+                >
+                    Track {trackDeleted.title} (id {trackDeleted.id}), uploaded on {trackDeleted.uploadedAt?.toDateString()} was deleted successfully.
+                </div>
+            {/if}
             <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
 
             <!-- Search Bar -->
@@ -127,6 +158,7 @@
             {#each data.tracks as track (track.id)}
                 <div
                     class="bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/20 overflow-hidden group"
+                    id="track-id-{track.id}"
                 >
                     <!-- Card Header -->
                     <div class="h-32 relative overflow-hidden">
@@ -328,16 +360,13 @@
                     >
                         Cancel
                     </button>
-                    <form action="/admin?/delete" method="POST">
-                        <input type="hidden" id="trackDeleteId" name="trackDeleteId" value="{trackToDelete.id}">
-                        <button
-                            type="button"
-                            onclick={closeDeleteModal}
-                            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
-                        >
-                            Confirm delete
-                        </button>
-                    </form>
+                    <button
+                        type="button"
+                        onclick={deleteTrack}
+                        class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+                    >
+                        Confirm delete
+                    </button>
                 </div>
             </div>
         </div>
