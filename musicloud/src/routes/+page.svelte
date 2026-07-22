@@ -1,11 +1,11 @@
 <script lang="ts">
     import type { PageData } from "./$types";
-    import type { ActionData } from "./admin/delete/$types";
     import type { Track } from "$lib/server/db/music";
 
     import WaveSurfer from "wavesurfer.js";
+    import { fade } from "svelte/transition";
 
-    let { data }: { data: PageData; form: ActionData } = $props();
+    let { data }: { data: PageData } = $props();
     let searchQuery = $state("");
     let activeTrackId: number | null = $state(null);
     let showDeleteModal = $state(false);
@@ -106,9 +106,11 @@
         <div class="mx-auto py-8">
             {#if isAuthenticated && trackDeleted}
                 <div
-                    class="fixed right-4 top-4 z-50 max-w-sm rounded-xl border border-green-500/40 bg-green-950/95 px-4 py-3 text-sm text-red-100 shadow-lg shadow-black/30 backdrop-blur"
+                    class="w-full fixed right-4 top-4 z-50 max-w-sm rounded-xl border border-green-500/40 bg-green-950/95 px-4 py-3 text-sm text-red-100 shadow-lg shadow-black/30 backdrop-blur"
+                    out:fade
+                    in:fade
                 >
-                    Track {trackDeleted.title} (id {trackDeleted.id}), uploaded on {trackDeleted.uploadedAt?.toDateString()} was deleted successfully.
+                    Track {trackDeleted.title} (id {trackDeleted.id}) was deleted successfully.
                 </div>
             {/if}
             <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
@@ -276,9 +278,8 @@
                             </button>
 
                             {#if isAuthenticated}
-                                <button
-                                    type="button"
-                                    onclick={() => {}}
+                                <a
+                                    href="/admin/update/{track.id}"
                                     class="inline-flex items-center justify-center w-12 h-12 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors"
                                     aria-label="Modify track"
                                     title="Modify track"
@@ -297,7 +298,7 @@
                                             d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
                                         />
                                     </svg>
-                                </button>
+                                </a>
 
                                 <button
                                     type="button"

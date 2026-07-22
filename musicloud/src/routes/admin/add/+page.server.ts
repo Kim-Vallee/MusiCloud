@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { createTrack } from '$lib/server/db/music';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
@@ -9,14 +9,14 @@ import { promisify } from 'node:util';
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
-        throw error(404, 'Not found');
+        throw error(403, 'You must be authenticated to add a track.');
     }
 };
 
 export const actions: Actions = {
     add_track: async ({ locals, request }) => {
         if (!locals.user) {
-            return fail(403, { error: 'You must be authenticated to add a track.' });
+            throw error(403, 'You must be authenticated to add a track.');
         }
 
         const formData = await request.formData();
@@ -118,7 +118,7 @@ export const actions: Actions = {
                 audioFile: audioFileName,
                 duration
             });
-
+            
             return { success: true, message: 'Track added successfully.' };
         } catch (err) {
             console.log(err);

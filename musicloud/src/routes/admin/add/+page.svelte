@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { redirect } from '@sveltejs/kit';
     import type { ActionData } from './$types';
 
     let { form }: { form?: ActionData } = $props();
@@ -11,6 +12,12 @@
     <div class="mx-auto max-w-4xl px-6 py-10">
         <div class="rounded-2xl border border-gray-800 bg-gray-900/80 p-8 shadow-2xl shadow-black/30">
             <div class="mb-8">
+                <a
+                    href="/"
+                    class="text-sm text-blue-300 hover:text-white transition-colors"
+                >
+                    ← Back to home
+                </a>
                 <p class="mb-2 text-sm uppercase tracking-[0.3em] text-blue-400">Admin</p>
                 <h1 class="text-3xl font-semibold text-white">Add a new track</h1>
                 <p class="mt-2 text-sm text-gray-400">Fill in the track details below to publish it to the catalog.</p>

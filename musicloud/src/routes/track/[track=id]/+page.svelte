@@ -26,8 +26,6 @@
             return;
         }
 
-        let audio_url = audioAssets[`../../../lib/audio/${audio}`] ?? "";
-
         import("wavesurfer.js").then((module) => {
             const WaveSurfer = module.default;
 
@@ -40,7 +38,7 @@
                 barRadius: 2,
             });
 
-            wavesurfer.load(audio_url);
+            wavesurfer.load(audio);
         });
     }
 
@@ -67,7 +65,7 @@
                     ← Back to home
                 </a>
                 <div
-                    use:waveform={data.track.audioFile}
+                    use:waveform={data.track.audioUrl}
                     class="opacity-100 w-full bg-black/20 mt-4"
                 ></div>
 
@@ -154,8 +152,7 @@
                                 <div class="">BPM: {data.track.bpm}</div>
                                 <div class="mt-2">
                                     Duration:
-                                    {Math.floor(data.track.duration / 60)}:{data
-                                        .track.duration % 60}
+                                    {Math.floor(data.track.duration / 60)}:{Math.round(data.track.duration % 60)}
                                 </div>
                                 <div class="mt-2">
                                     Upload date: {formatDate(

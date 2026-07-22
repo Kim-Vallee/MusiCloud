@@ -10,7 +10,10 @@ export const load: PageServerLoad = async ({ locals, params }) => {
         });
     }
     return {
-        track: track,
+        track: {
+            ...track,
+            audioUrl: `/content/${track.audioFile}`,
+        },
         isAuthenticated: Boolean(locals.user),
     };
 };

@@ -21,12 +21,6 @@
                         {page.error?.message}
                     </h1>
 
-                    <p class="mt-3 text-sm text-gray-300 leading-6">
-                        The page you are looking for doesn't exist or has been
-                        moved. If you followed a link, it may be broken or
-                        outdated.
-                    </p>
-
                     <div class="mt-3">
                         <a
                             href="/"
