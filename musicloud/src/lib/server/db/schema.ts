@@ -10,6 +10,6 @@ export const music = sqliteTable('music', {
 	styles: text('style', { mode: 'json' }).$type<string[]>(),
 	setup: text('setup'),
 	tags: text('tags', { mode: 'json' }).$type<string[]>(),
-	audioFile: text('audio_file'),
+	audioFile: text('audio_file').notNull(),
 	duration: integer('duration').notNull().default(0),
 })

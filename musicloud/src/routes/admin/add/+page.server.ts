@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { createTrack } from '$lib/server/db/music';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { getAudioDir } from '$lib/assets';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
@@ -44,7 +44,7 @@ export const actions: Actions = {
             return fail(400, {error: 'File is required. '}); 
         }
 
-        let audioFileName: string | null = null;
+        let audioFileName: string = "";
         let filePath: string | null = null;
 
         try {
@@ -57,7 +57,7 @@ export const actions: Actions = {
                 const uniqueSuffix = Math.random().toString(16).slice(2, 10);
                 audioFileName = `${uniqueSuffix}-${safeTitle}.${extension}`;
 
-                const audioDir = join(fileURLToPath(new URL('../../../lib/audio', import.meta.url)));
+                const audioDir = getAudioDir();
                 await mkdir(audioDir, { recursive: true });
                 filePath = join(audioDir, audioFileName);
                 const bytes = await audioFile.arrayBuffer();
@@ -66,6 +66,10 @@ export const actions: Actions = {
         } catch (err) {
             console.log(err);
             return fail(500, { error: "Failed to save file."})
+        }
+
+        if (!filePath || audioFileName === "") {
+            return fail(400, "Unkown error while saving file");
         }
 
         // Get duration

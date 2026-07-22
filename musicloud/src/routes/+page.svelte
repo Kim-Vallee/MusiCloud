@@ -1,29 +1,20 @@
 <script lang="ts">
     import type { PageData } from "./$types";
     import type { ActionData } from "./admin/delete/$types";
+    import type { Track } from "$lib/server/db/music";
 
     import WaveSurfer from "wavesurfer.js";
-
-    const audioAssets = import.meta.glob("../lib/audio/*.{mp3,wav,ogg}", {
-        eager: true,
-        import: "default",
-    }) as Record<string, string>;
 
     let { data }: { data: PageData; form: ActionData } = $props();
     let searchQuery = $state("");
     let activeTrackId: number | null = $state(null);
     let showDeleteModal = $state(false);
     let trackToDelete: { id: number; title: string } | null = $state(null);
-    let trackDeleted = $state(null);
+    let trackDeleted: Track | null = $state(null);
 
     const isAuthenticated = $derived(Boolean(data.isAuthenticated));
 
     let wavesurfers = new Map<HTMLElement, WaveSurfer>();
-
-    function getAudioUrl(audioFile: string | null) {
-        if (!audioFile) return "";
-        return audioAssets[`../lib/audio/${audioFile}`] ?? "";
-    }
 
     function waveform(node: HTMLElement, audio: string) {
         import("wavesurfer.js").then((module) => {
@@ -163,7 +154,7 @@
                     <!-- Card Header -->
                     <div class="h-32 relative overflow-hidden">
                         <div
-                            use:waveform={getAudioUrl(track.audioFile)}
+                            use:waveform={track.audioUrl}
                             class="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity bg-black/20"
                         ></div>
                     </div>

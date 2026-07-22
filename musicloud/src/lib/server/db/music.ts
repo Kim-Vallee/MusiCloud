@@ -2,6 +2,20 @@ import { db } from ".";
 import { music } from "./schema";
 import { eq, like, and, sql, gte, lte } from "drizzle-orm";
 
+export type Track = {
+    id: number;
+    title: string;
+    author: string;
+    description?: string | null;
+    uploadedAt?: Date | null;
+    bpm?: number | null;
+    styles?: string[] | null;
+    setup?: string | null;
+    tags?: string[] | null;
+    audioFile: string;
+    duration: number;
+};
+
 export const getAllTracks = () => db.select().from(music).all();
 export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
 export const getTrackByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
@@ -13,7 +27,7 @@ export const deleteTrackById = async (id: number) => {
     if (!track) {
         return false;
     }
-    return track;
+    return track[0];
 
 }
 
@@ -26,7 +40,7 @@ export const createTrack = async (input: {
     styles?: string[] | null;
     setup?: string | null;
     tags?: string[] | null;
-    audioFile?: string | null;
+    audioFile: string;
     duration: number;
 }) => {
     const tags = input.tags?.filter(Boolean) ?? [];
@@ -41,7 +55,7 @@ export const createTrack = async (input: {
         styles,
         setup: input.setup?.trim() || null,
         tags,
-        audioFile: input.audioFile?.trim() || null,
+        audioFile: input.audioFile.trim(),
         duration: input.duration,
     }).run();
 };
