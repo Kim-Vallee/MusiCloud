@@ -1,13 +1,38 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { deleteTrackById, getAllTracks, getTrackById, hideTrackById, showTrackById } from "$lib/server/db/music";
+import { deleteTrackById, getAllTracks, getTrackById, hideTrackById, showTrackById, type Track } from "$lib/server/db/music";
 import { error, fail } from "@sveltejs/kit";
 import { getAudioPath } from "$lib/assets";
 import { rm } from "node:fs/promises";
 
 export const load: PageServerLoad = async ({ locals }) => {
     let isAuthenticated = Boolean(locals.user);
+    let allTracks = getAllTracks(isAuthenticated);
+    const uniqueTags = new Set<string>();
+    const uniqueStyles = new Set<string>();
+
+    for (const track of allTracks) {
+        for (const tag of track.tags ?? []) {
+            if (tag) {
+                uniqueTags.add(tag);
+            }
+        }
+        for (const style of track.styles ?? []) {
+            if (style) {
+                uniqueStyles.add(style);
+            }
+        }
+    }
+
+    let allTags = Array.from(uniqueTags);
+    let allStyles = Array.from(uniqueStyles);
+
+    allTags.sort()
+    allStyles.sort()
+
     return {
-        tracks: getAllTracks(isAuthenticated),
+        tracks: allTracks,
+        allTags: allTags,
+        allStyles: allStyles,
         isAuthenticated: isAuthenticated,
     };
 };

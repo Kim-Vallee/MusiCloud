@@ -6,11 +6,21 @@
     import { enhance } from "$app/forms";
 
     let { data, form }: PageProps = $props();
-    let searchQuery = $state("");
     let activeTrackId: number | null = $state(null);
     let showDeleteModal = $state(false);
     let trackToDelete: { id: number; title: string } | null = $state(null);
     let showFormResult: boolean | null = $state(false);
+    
+    let searchQuery = $state("");
+    let durationComparator = $state(">" );
+    let durationValue = $state("");
+    let bpmComparator = $state(">" );
+    let bpmValue = $state("");
+
+    let allTags = $derived(data.allTags);
+    let allStyles = $derived(data.allStyles);
+
+    let searchInputClasses = "w-full rounded-lg border border-gray-700 bg-gray-800 py-3 px-4 text-white transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30";
 
     const isAuthenticated = $derived(Boolean(data.isAuthenticated));
 
@@ -103,27 +113,107 @@
             {/if}
             <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
 
-            <!-- Search Bar -->
-            <div class="relative">
-                <input
-                    type="text"
-                    bind:value={searchQuery}
-                    placeholder="Search tracks by title, artist, or style..."
-                    class="w-full px-4 py-3 pl-12 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-30 transition-all"
-                />
-                <svg
-                    class="absolute left-3 top-3 w-6 h-6 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    ></path>
-                </svg>
+            <div class="rounded-2xl border border-gray-700 bg-gray-900/80 p-4 shadow-lg shadow-black/20">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
+                    <div class="flex-1">
+                        <label for="title-author-search" class="mb-2 block text-sm font-medium text-gray-300">
+                            Search by title or author
+                        </label>
+                        <div class="relative">
+                            <input
+                                id="title-author-search"
+                                type="text"
+                                bind:value={searchQuery}
+                                placeholder="Search tracks by title or author..."
+                                class="pl-12 {searchInputClasses}"
+                            />
+                            <svg
+                                class="absolute left-3 top-3 w-6 h-6 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                ></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <!-- <Tags bind:tags placeholder="azeae" autoComplete={allTags} onlyUnique/> -->
+                        <label for="tag-filter" class="mb-2 block text-sm font-medium text-gray-300">
+                            Tags
+                        </label>
+                        <input
+                            id="tag-filter"
+                            placeholder="Add tags"
+                            class="{searchInputClasses}"
+                        />
+                    </div>
+
+                    <div class="flex-1">
+                        <label for="style-filter" class="mb-2 block text-sm font-medium text-gray-300">
+                            Styles
+                        </label>
+                        <input
+                            id="style-filter"
+                            placeholder="Add styles"
+                            class="{searchInputClasses}"
+                        />
+                    </div>
+                </div>
+
+                <div class="mt-4 grid gap-4 md:grid-cols-2">
+                    <div class="rounded-xl border border-gray-700 bg-gray-800/70 p-3">
+                        <label for="duration-filter" class="text-sm font-medium text-gray-300">
+                            Duration
+                        </label>
+                        <div class="mt-2 flex gap-2">
+                            <select
+                                id="duration-filter"
+                                bind:value={durationComparator}
+                                class="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value=">">Greater than</option>
+                                <option value="<">Less than</option>
+                            </select>
+                            <input
+                                type="number"
+                                bind:value={durationValue}
+                                min="0"
+                                placeholder="Minutes"
+                                class="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-700 bg-gray-800/70 p-3">
+                        <label for="bpm-filter" class="text-sm font-medium text-gray-300">
+                            BPM
+                        </label>
+                        <div class="mt-2 flex gap-2">
+                            <select
+                                id="bpm-filter"
+                                bind:value={bpmComparator}
+                                class="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value=">">Greater than</option>
+                                <option value="<">Less than</option>
+                            </select>
+                            <input
+                                type="number"
+                                bind:value={bpmValue}
+                                min="0"
+                                placeholder="BPM"
+                                class="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Tracks Grid -->

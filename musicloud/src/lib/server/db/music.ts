@@ -23,6 +23,7 @@ export const getAllTracks = (showAll: boolean) => {
     }
     return db.select().from(music).orderBy(desc(music.uploadedAt)).all();
 }
+
 export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
 export const getTrackByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
 export const getTrackByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
