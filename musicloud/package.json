@@ -23,6 +23,7 @@
 		"@types/dateformat": "^5.0.3",
 		"@types/node": "^24",
 		"@types/sqlite3": "^3.1.11",
+		"@types/yaireo__tagify": "^4.27.0",
 		"drizzle-kit": "^0.31.10",
 		"drizzle-orm": "^0.45.2",
 		"svelte": "^5.56.1",
@@ -33,6 +34,7 @@
 	"dependencies": {
 		"@auth/sveltekit": "^1.11.2",
 		"@tailwindcss/vite": "^4.3.1",
+		"@yaireo/tagify": "^4.38.0",
 		"better-auth": "^1.6.20",
 		"better-sqlite3": "^12.10.0",
 		"dateformat": "^5.0.3",

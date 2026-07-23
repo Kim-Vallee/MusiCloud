@@ -2,6 +2,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
+	import "@yaireo/tagify/dist/tagify.css";
 	import "../app.css";
 </script>
 

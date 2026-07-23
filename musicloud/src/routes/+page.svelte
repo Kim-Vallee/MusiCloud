@@ -2,8 +2,10 @@
     import type { PageProps } from "./$types";
 
     import WaveSurfer from "wavesurfer.js";
+    import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import { enhance } from "$app/forms";
+    import Tagify from "@yaireo/tagify";
 
     let { data, form }: PageProps = $props();
     let activeTrackId: number | null = $state(null);
@@ -17,10 +19,13 @@
     let bpmComparator = $state(">" );
     let bpmValue = $state("");
 
+    let tagFilterInput: HTMLInputElement | undefined;
+    let styleFilterInput: HTMLInputElement | undefined;
+
     let allTags = $derived(data.allTags);
     let allStyles = $derived(data.allStyles);
 
-    let searchInputClasses = "w-full rounded-lg border border-gray-700 bg-gray-800 py-3 px-4 text-white transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30";
+    let searchInputClasses = "rounded-lg w-full border bg-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 py-3 px-4";
 
     const isAuthenticated = $derived(Boolean(data.isAuthenticated));
 
@@ -83,6 +88,40 @@
         trackToDelete = null;
     }
 
+    onMount(() => {
+        const instances: Array< {destroy: () => void}> = [];
+
+        if (tagFilterInput) {
+            instances.push(
+                new Tagify(tagFilterInput, {
+                    delimiters: ",",
+                    maxTags: 10,
+                    dropdown: { enabled: 0, maxItems: 6 },
+                    keepInvalidTags: false,
+                    whitelist: allTags,
+                    enforceWhitelist: true,
+                }),
+            );
+        }
+
+        if (styleFilterInput) {
+            instances.push(
+                new Tagify(styleFilterInput, {
+                    delimiters: ",",
+                    maxTags: 10,
+                    dropdown: { enabled: 0, maxItems: 6 },
+                    keepInvalidTags: false,
+                    whitelist: allStyles,
+                    enforceWhitelist: true,
+                }),
+            );
+        }
+
+        return () => {
+            instances.forEach((instance) => instance.destroy());
+        }
+    })
+
     $effect(() => {
         // Filter sounds based on search query
     });
@@ -125,7 +164,7 @@
                                 type="text"
                                 bind:value={searchQuery}
                                 placeholder="Search tracks by title or author..."
-                                class="pl-12 {searchInputClasses}"
+                                class="pl-12 w-full rounded-lg border border-gray-700 bg-gray-800 py-3 px-4 text-white transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 hover:border-white hover:ring-2 hover:ring-white/30"
                             />
                             <svg
                                 class="absolute left-3 top-3 w-6 h-6 text-gray-400"
@@ -149,9 +188,10 @@
                             Tags
                         </label>
                         <input
+                            bind:this={tagFilterInput}
                             id="tag-filter"
                             placeholder="Add tags"
-                            class="{searchInputClasses}"
+                            class="customTagify {searchInputClasses}"
                         />
                     </div>
 
@@ -160,9 +200,10 @@
                             Styles
                         </label>
                         <input
+                            bind:this={styleFilterInput}
                             id="style-filter"
                             placeholder="Add styles"
-                            class="{searchInputClasses}"
+                            class="customTagify {searchInputClasses}"
                         />
                     </div>
                 </div>
