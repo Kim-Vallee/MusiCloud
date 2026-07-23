@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { redirect } from '@sveltejs/kit';
     import type { ActionData } from './$types';
 
     let { form }: { form?: ActionData } = $props();

@@ -1,1 +1,0 @@
-ALTER TABLE `music` DROP COLUMN `created_at`;

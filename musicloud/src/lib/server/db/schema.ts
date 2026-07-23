@@ -8,6 +8,7 @@ export const music = sqliteTable('music', {
 	uploadedAt: integer('uploaded_at', { mode: 'timestamp'}).notNull().$defaultFn(() => new Date()),
 	bpm: integer('bpm'),
 	styles: text('style', { mode: 'json' }).$type<string[]>(),
+	hidden: integer('hidden', { mode: 'boolean' }).default(false).notNull(),
 	setup: text('setup'),
 	tags: text('tags', { mode: 'json' }).$type<string[]>(),
 	audioFile: text('audio_file').notNull(),

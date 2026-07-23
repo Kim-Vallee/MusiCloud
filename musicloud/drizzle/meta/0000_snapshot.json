@@ -1,16 +1,23 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ff4b1687-7877-41e8-bf2f-8e6760269322",
+  "id": "40b20dbf-191f-452e-bbfa-e439ae1bc5dc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "music": {
       "name": "music",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
         "title": {
           "name": "title",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -36,13 +43,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "bpm": {
           "name": "bpm",
           "type": "integer",
@@ -57,6 +57,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "hidden": {
+          "name": "hidden",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
         "setup": {
           "name": "setup",
           "type": "text",
@@ -70,6 +78,21 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "audio_file": {
+          "name": "audio_file",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},

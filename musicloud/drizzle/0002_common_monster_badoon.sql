@@ -1,1 +1,0 @@
-ALTER TABLE `music` ADD `audio_file` text;

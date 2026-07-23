@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1781864681332,
-      "tag": "0000_wooden_gorilla_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1782204611368,
-      "tag": "0001_lying_kylun",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1783532224237,
-      "tag": "0002_common_monster_badoon",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1784297474152,
-      "tag": "0003_foamy_lily_hollister",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1784301768753,
-      "tag": "0004_glorious_hobgoblin",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1784562176668,
-      "tag": "0005_grey_wong",
+      "when": 1784797652686,
+      "tag": "0000_aberrant_payback",
       "breakpoints": true
     }
   ]

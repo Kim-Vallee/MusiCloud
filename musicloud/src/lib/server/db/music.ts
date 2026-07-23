@@ -1,6 +1,6 @@
 import { db } from ".";
 import { music } from "./schema";
-import { eq, like, and, sql, gte, lte } from "drizzle-orm";
+import { eq, like, and, sql, gte, lte, desc } from "drizzle-orm";
 
 export type Track = {
     id: number;
@@ -10,17 +10,37 @@ export type Track = {
     uploadedAt?: Date | null;
     bpm?: number | null;
     styles?: string[] | null;
+    hidden: boolean;
     setup?: string | null;
     tags?: string[] | null;
     audioFile: string;
     duration: number;
 };
 
-export const getAllTracks = () => db.select().from(music).all();
+export const getAllTracks = (showAll: boolean) => {
+    if (!showAll) {
+        return db.select().from(music).orderBy(desc(music.uploadedAt)).where(eq(music.hidden, false)).all();
+    }
+    return db.select().from(music).orderBy(desc(music.uploadedAt)).all();
+}
 export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
 export const getTrackByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
 export const getTrackByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
 export const getTrackById = (id: number) => db.select().from(music).where(eq(music.id, id)).all()[0] ?? null;
+
+export const hideTrackById = async (id: number) => {
+    return db.update(music)
+        .set({
+            hidden: true
+        }).where(eq(music.id, id));
+}
+
+export const showTrackById = async (id: number) => {
+    return db.update(music)
+        .set({
+            hidden: false
+        }).where(eq(music.id, id));
+}
 
 export const updateTrackById = async (id: number, input: {
     title: string;

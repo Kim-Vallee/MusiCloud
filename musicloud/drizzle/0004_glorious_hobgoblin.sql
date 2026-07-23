@@ -1,1 +1,0 @@
-ALTER TABLE `music` ADD `duration` integer NOT NULL;
