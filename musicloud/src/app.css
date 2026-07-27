@@ -4,16 +4,18 @@ tags.customTagify {
     --tags-border-color: var(--color-gray-700);
     --tags-text-color: var(--color-white) !important;
     --tags-text-color--edit: var(--color-white) !important;
+    --tag-text-color--edit: var(--color-white);
+    --placeholder-color-focus: rgba(255, 255, 255, 0.5);
     --input-color: var(--color-white) !important;
-    /* --tag-bg: var(--color-gray-800) !important; */
     --placeholder-color: var(--color-gray-400) !important;
     padding-inline: calc(var(--spacing) * 4) !important;
     padding-block: calc(var(--spacing) * 3) !important;
+    --loader-size: 32px;
 }
 
-.customTagify span{
-    padding:0;
-    margin:0;
+.customTagify span {
+    padding: 0;
+    margin: 0;
     min-height: 0;
 }
 
@@ -32,3 +34,44 @@ tags.tagify:hover:not(.tagify--focus):not(.tagify--invalid) {
     --tw-ring-color: color-mix(in oklab, var(--color-white) 30%, transparent);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
 }
+
+tag.tagify__tag {
+    margin-top: 0;
+    margin-bottom: 0;
+
+}
+
+tag.tagify__tag>div {
+    font-size: 11px;
+}
+
+
+/* Filter by style */
+tags.customTagify.style-tagify {
+    --tag-bg: color-mix(in oklab, var(--color-purple-900)
+            /* oklch(38.1% 0.176 304.987) = #59168b */
+            50%, transparent);
+    --tag-hover: color-mix(in oklab, var(--color-purple-900)
+            /* oklch(38.1% 0.176 304.987) = #59168b */
+            70%, transparent);
+    --tag-text-color: var(--color-purple-300)
+        /* oklch(82.7% 0.119 306.383) */
+    ;
+    --tag-border-radius: calc(infinity * 1px);
+}
+
+/* Filter by tag */
+tags.customTagify.tag-tagify {
+    --tag-bg: color-mix(in oklab, var(--color-blue-900)
+            /* oklch(38.1% 0.176 304.987) = #59168b */
+            50%, transparent);
+    --tag-hover: color-mix(in oklab, var(--color-blue-900)
+            /* oklch(38.1% 0.176 304.987) = #59168b */
+            70%, transparent);
+    --tag-text-color: var(--color-blue-300)
+        /* oklch(82.7% 0.119 306.383) */
+    ;
+    --tag-border-radius: calc(infinity * 1px);
+}
+
+/* https://github.com/yairEO/tagify#suggestions-dropdown-css-variables */

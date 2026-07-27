@@ -12,12 +12,8 @@
     let showDeleteModal = $state(false);
     let trackToDelete: { id: number; title: string } | null = $state(null);
     let showFormResult: boolean | null = $state(false);
-    
+
     let searchQuery = $state("");
-    let durationComparator = $state(">" );
-    let durationValue = $state("");
-    let bpmComparator = $state(">" );
-    let bpmValue = $state("");
 
     let tagFilterInput: HTMLInputElement | undefined;
     let styleFilterInput: HTMLInputElement | undefined;
@@ -25,7 +21,8 @@
     let allTags = $derived(data.allTags);
     let allStyles = $derived(data.allStyles);
 
-    let searchInputClasses = "rounded-lg w-full border bg-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 py-3 px-4";
+    let searchInputClasses =
+        "rounded-lg w-full border bg-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 py-3 px-4";
 
     const isAuthenticated = $derived(Boolean(data.isAuthenticated));
 
@@ -89,7 +86,7 @@
     }
 
     onMount(() => {
-        const instances: Array< {destroy: () => void}> = [];
+        const instances: Array<{ destroy: () => void }> = [];
 
         if (tagFilterInput) {
             instances.push(
@@ -119,8 +116,8 @@
 
         return () => {
             instances.forEach((instance) => instance.destroy());
-        }
-    })
+        };
+    });
 
     $effect(() => {
         // Filter sounds based on search query
@@ -152,109 +149,86 @@
             {/if}
             <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
 
-            <div class="rounded-2xl border border-gray-700 bg-gray-900/80 p-4 shadow-lg shadow-black/20">
-                <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
-                    <div class="flex-1">
-                        <label for="title-author-search" class="mb-2 block text-sm font-medium text-gray-300">
-                            Search by title or author
-                        </label>
-                        <div class="relative">
-                            <input
-                                id="title-author-search"
-                                type="text"
-                                bind:value={searchQuery}
-                                placeholder="Search tracks by title or author..."
-                                class="pl-12 w-full rounded-lg border border-gray-700 bg-gray-800 py-3 px-4 text-white transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 hover:border-white hover:ring-2 hover:ring-white/30"
-                            />
-                            <svg
-                                class="absolute left-3 top-3 w-6 h-6 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+            <div
+                class="rounded-2xl border border-gray-700 bg-gray-900/80 p-4 shadow-lg shadow-black/20"
+            >
+                <form action="/?search" method="GET">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
+                        <div class="flex-1">
+                            <label
+                                for="title-author-search"
+                                class="mb-2 block text-sm font-medium text-gray-300"
                             >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                ></path>
-                            </svg>
+                                Filter by title or author
+                            </label>
+                            <div class="relative">
+                                <input
+                                    id="title-author-search"
+                                    type="text"
+                                    bind:value={searchQuery}
+                                    placeholder="Search tracks by title or author..."
+                                    class="pl-12 w-full rounded-lg border border-gray-700 bg-gray-800 py-3 px-4 text-white transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 hover:border-white hover:ring-2 hover:ring-white/30"
+                                />
+                                <svg
+                                    class="absolute left-3 top-3 w-6 h-6 text-gray-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                    ></path>
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex-1">
-                        <!-- <Tags bind:tags placeholder="azeae" autoComplete={allTags} onlyUnique/> -->
-                        <label for="tag-filter" class="mb-2 block text-sm font-medium text-gray-300">
-                            Tags
-                        </label>
-                        <input
-                            bind:this={tagFilterInput}
-                            id="tag-filter"
-                            placeholder="Add tags"
-                            class="customTagify {searchInputClasses}"
-                        />
-                    </div>
-
-                    <div class="flex-1">
-                        <label for="style-filter" class="mb-2 block text-sm font-medium text-gray-300">
-                            Styles
-                        </label>
-                        <input
-                            bind:this={styleFilterInput}
-                            id="style-filter"
-                            placeholder="Add styles"
-                            class="customTagify {searchInputClasses}"
-                        />
-                    </div>
-                </div>
-
-                <div class="mt-4 grid gap-4 md:grid-cols-2">
-                    <div class="rounded-xl border border-gray-700 bg-gray-800/70 p-3">
-                        <label for="duration-filter" class="text-sm font-medium text-gray-300">
-                            Duration
-                        </label>
-                        <div class="mt-2 flex gap-2">
-                            <select
-                                id="duration-filter"
-                                bind:value={durationComparator}
-                                class="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                    <div class="flex flex-col gap-4 mt-4 lg:flex-row">
+                        <div class="flex-2">
+                            <label
+                                for="tag-filter"
+                                class="mb-2 block text-sm font-medium text-gray-300"
                             >
-                                <option value=">">Greater than</option>
-                                <option value="<">Less than</option>
-                            </select>
+                                Filter by tags
+                            </label>
                             <input
-                                type="number"
-                                bind:value={durationValue}
-                                min="0"
-                                placeholder="Minutes"
-                                class="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                                bind:this={tagFilterInput}
+                                id="tag-filter"
+                                placeholder="Add tags"
+                                class="customTagify tag-tagify {searchInputClasses}"
                             />
                         </div>
-                    </div>
 
-                    <div class="rounded-xl border border-gray-700 bg-gray-800/70 p-3">
-                        <label for="bpm-filter" class="text-sm font-medium text-gray-300">
-                            BPM
-                        </label>
-                        <div class="mt-2 flex gap-2">
-                            <select
-                                id="bpm-filter"
-                                bind:value={bpmComparator}
-                                class="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                        <div class="flex-2">
+                            <label
+                                for="style-filter"
+                                class="mb-2 block text-sm font-medium text-gray-300"
                             >
-                                <option value=">">Greater than</option>
-                                <option value="<">Less than</option>
-                            </select>
+                                Filter by style
+                            </label>
                             <input
-                                type="number"
-                                bind:value={bpmValue}
-                                min="0"
-                                placeholder="BPM"
-                                class="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                                bind:this={styleFilterInput}
+                                id="style-filter"
+                                placeholder="Add styles"
+                                class="customTagify style-tagify {searchInputClasses}"
                             />
                         </div>
+
+                        <div class="flex-1 flex items-end">
+                            <button
+                                type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 inline-flex items-center justify-center p-3 w-full text-white rounded-xl transition-colors cursor-pointer"
+                                aria-label="Search"
+                                title="Search"
+                            >
+                                Search
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
         <!-- Tracks Grid -->
@@ -421,59 +395,63 @@
                                 </button>
 
                                 <form action="?/hide_track" method="POST">
-                                <input type="hidden" value="{track.id}" name="trackId">
-                                {#if track.hidden}
-                                    <button
-                                        type="submit"
-                                        class="inline-flex items-center justify-center w-12 h-12 text-white rounded-xl transition-colors bg-gray-700 hover:bg-gray-600"
-                                        aria-label="Show track (currently hidden)"
-                                        title="Show track (currently hidden)"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-6"
+                                    <input
+                                        type="hidden"
+                                        value={track.id}
+                                        name="trackId"
+                                    />
+                                    {#if track.hidden}
+                                        <button
+                                            type="submit"
+                                            class="inline-flex items-center justify-center w-12 h-12 text-white rounded-xl transition-colors bg-gray-700 hover:bg-gray-600"
+                                            aria-label="Show track (currently hidden)"
+                                            title="Show track (currently hidden)"
                                         >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
-                                            />
-                                        </svg>
-                                    </button>
-                                {:else}
-                                    <button
-                                        type="submit"
-                                        class="inline-flex items-center justify-center w-12 h-12 text-white rounded-xl transition-colors bg-gray-700 hover:bg-gray-600"
-                                        aria-label="Hide track (currently shown)"
-                                        title="Hide track (currently shown)"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            class="size-6"
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                stroke="currentColor"
+                                                class="size-6"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                                                />
+                                            </svg>
+                                        </button>
+                                    {:else}
+                                        <button
+                                            type="submit"
+                                            class="inline-flex items-center justify-center w-12 h-12 text-white rounded-xl transition-colors bg-gray-700 hover:bg-gray-600"
+                                            aria-label="Hide track (currently shown)"
+                                            title="Hide track (currently shown)"
                                         >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                            />
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                            />
-                                        </svg>
-                                    </button>
-                                {/if}
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                stroke="currentColor"
+                                                class="size-6"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                />
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                />
+                                            </svg>
+                                        </button>
+                                    {/if}
                                 </form>
-                                
+
                                 <button
                                     type="button"
                                     onclick={() => openDeleteModal(track)}
