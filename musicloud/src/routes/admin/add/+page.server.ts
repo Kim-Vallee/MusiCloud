@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { createTrack } from '$lib/server/db/music';
+import { createTrack, getAllTracks } from '$lib/server/db/music';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getAudioDir } from '$lib/assets';
@@ -11,6 +11,12 @@ export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
         throw error(403, 'You must be authenticated to add a track.');
     }
+
+    const allTracks = getAllTracks(true);
+
+    // Get all unique authors
+    // Get all unique styles
+    // Get all unique tags
 };
 
 export const actions: Actions = {
