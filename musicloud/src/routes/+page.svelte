@@ -6,6 +6,7 @@
     import { fade } from "svelte/transition";
     import { enhance } from "$app/forms";
     import Tagify from "@yaireo/tagify";
+    import { goto } from "$app/navigation";
 
     let { data, form }: PageProps = $props();
     let activeTrackId: number | null = $state(null);
@@ -97,6 +98,8 @@
                     keepInvalidTags: false,
                     whitelist: allTags,
                     enforceWhitelist: true,
+                    originalInputValueFormat: (valuesArr) =>
+                        valuesArr.map((item) => item.value).join(","),
                 }),
             );
         }
@@ -110,6 +113,8 @@
                     keepInvalidTags: false,
                     whitelist: allStyles,
                     enforceWhitelist: true,
+                    originalInputValueFormat: (valuesArr) =>
+                        valuesArr.map((item) => item.value).join(","),
                 }),
             );
         }
@@ -147,12 +152,12 @@
                     </div>
                 {/if}
             {/if}
-            <h1 class="text-3xl font-bold text-white mb-6">MusiCloud</h1>
+            <h1 class="text-3xl font-bold text-white mb-6"> <a href="/">MusiCloud</a></h1>
 
             <div
                 class="rounded-2xl border border-gray-700 bg-gray-900/80 p-4 shadow-lg shadow-black/20"
             >
-                <form action="/?search" method="GET">
+                <form action="/" method="GET">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
                         <div class="flex-1">
                             <label
@@ -164,6 +169,7 @@
                             <div class="relative">
                                 <input
                                     id="title-author-search"
+                                    name="title-author-search"
                                     type="text"
                                     bind:value={searchQuery}
                                     placeholder="Search tracks by title or author..."
@@ -197,6 +203,7 @@
                             <input
                                 bind:this={tagFilterInput}
                                 id="tag-filter"
+                                name="tag-filter"
                                 placeholder="Add tags"
                                 class="customTagify tag-tagify {searchInputClasses}"
                             />
@@ -212,6 +219,7 @@
                             <input
                                 bind:this={styleFilterInput}
                                 id="style-filter"
+                                name="style-filter"
                                 placeholder="Add styles"
                                 class="customTagify style-tagify {searchInputClasses}"
                             />
@@ -373,7 +381,9 @@
                             {#if isAuthenticated}
                                 <button
                                     type="button"
-                                    onclick={() => {}}
+                                    onclick={() => {
+                                        goto(`/admin/update/${track.id}`);
+                                    }}
                                     class="inline-flex items-center justify-center w-12 h-12 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors"
                                     aria-label="Modify track"
                                     title="Modify track"

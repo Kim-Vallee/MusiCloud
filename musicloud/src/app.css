@@ -75,3 +75,12 @@ tags.customTagify.tag-tagify {
 }
 
 /* https://github.com/yairEO/tagify#suggestions-dropdown-css-variables */
+:root {
+    --tagify-dd-bg-color: var(--color-gray-800);
+    --tagify-dd-text-color: var(--color-white);
+    --tagify-dd-color-primary: var(--color-gray-600);
+}
+
+button {
+    cursor: pointer;
+}

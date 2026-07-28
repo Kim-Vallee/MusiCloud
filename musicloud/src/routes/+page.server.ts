@@ -1,11 +1,31 @@
 import type { Actions, PageServerLoad } from "./$types";
 import { deleteTrackById, getAllTracks, getTrackById, hideTrackById, showTrackById, type Track } from "$lib/server/db/music";
-import { error, fail } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import { getAudioPath } from "$lib/assets";
 import { rm } from "node:fs/promises";
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
     let isAuthenticated = Boolean(locals.user);
+
+    // Clean URL before any db call
+
+    const URLparams = new URLSearchParams(url.searchParams);
+    for (const [key, value] of URLparams.entries()) {
+        if (!value.trim()) {
+            URLparams.delete(key);
+        }
+    }
+
+    const cleanUrl = URLparams.toString();
+    
+    if (cleanUrl !== url.searchParams.toString()) {
+        if (!cleanUrl) {
+            throw redirect(303, "/");
+        }
+        throw redirect(303, `/?${cleanUrl}`);
+    }
+
+
     let allTracks = getAllTracks(isAuthenticated);
     const uniqueTags = new Set<string>();
     const uniqueStyles = new Set<string>();
@@ -28,6 +48,40 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     allTags.sort()
     allStyles.sort()
+
+
+    // Filter tracks by search params
+    const titleAuthorSearch = (url.searchParams.get("title-author-search") ?? "").toLowerCase();
+
+    const tagsSearch = (url.searchParams.get("tag-filter") ?? "")
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+    const styleSearch = (url.searchParams.get("style-filter") ?? "")
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+    allTracks = allTracks.filter((track) => {
+        if (
+            titleAuthorSearch &&
+            !track.title.toLowerCase().includes(titleAuthorSearch) &&
+            !track.author.toLowerCase().includes(titleAuthorSearch)
+        ) {
+            return false;
+        }
+
+        if (!tagsSearch.every((tag) => track.tags?.includes(tag))) {
+            return false;
+        }
+
+        if (!styleSearch.every((style) => track.styles?.includes(style))) {
+            return false;
+        }
+
+        return true;
+    });
 
     return {
         tracks: allTracks,
