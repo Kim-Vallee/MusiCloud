@@ -1,6 +1,6 @@
 # Musicloud
 
-## General information
+## General information
 
 The idea behind this website is to create a lightweight alternative to soundcloud that would be self hosted as a sort of portfolio. It should have the following features:
 * Interface to add / remove / update music
@@ -19,6 +19,13 @@ The idea behind this website is to create a lightweight alternative to soundclou
 * A tagging system
 
 ## Coding stack
+
+### Requirements
+
+The app requires NodeJS and ffprobe:
+
+- [NodeJS](https://nodejs.org/en/download)
+- [ffprobe (ffmpeg)](https://ffmpeg.org/download.html)
 
 ### General
 

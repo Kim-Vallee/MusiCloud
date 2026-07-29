@@ -13,10 +13,27 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
 
     const allTracks = getAllTracks(true);
+    let allUniqueAuthors: string[] = [];
+    let allUniqueStyles: string[] = [];
+    let allUniqueTags: string[] = [];
 
-    // Get all unique authors
-    // Get all unique styles
-    // Get all unique tags
+    // Get all unique authors, styles and tags
+    for (const track of allTracks) {
+        if (track.author && !allUniqueAuthors.includes(track.author)) {
+            allUniqueAuthors.push(track.author);
+        }
+        if(track.styles && track.styles.length > 0) {
+            allUniqueStyles.push(...track.styles.filter((style) => !allUniqueStyles.includes(style)));
+        }
+        if(track.tags && track.tags.length > 0) {
+            allUniqueTags.push(...track.tags.filter((tag) => !allUniqueTags.includes(tag)));
+        }
+    }
+    return {
+        allUniqueAuthors: allUniqueAuthors.sort(),
+        allUniqueStyles: allUniqueStyles.sort(),
+        allUniqueTags: allUniqueTags.sort()
+    }
 };
 
 export const actions: Actions = {

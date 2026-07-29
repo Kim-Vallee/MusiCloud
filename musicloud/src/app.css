@@ -1,13 +1,26 @@
 @import "tailwindcss";
 
+/* General */
+
+/* https://github.com/yairEO/tagify#suggestions-dropdown-css-variables */
+:root {
+    --tagify-dd-bg-color: var(--color-gray-800);
+    --tagify-dd-text-color: var(--color-white);
+    --tagify-dd-color-primary: var(--color-gray-600);
+}
+
+button {
+    cursor: pointer;
+}
+
 tags.customTagify {
     --tags-border-color: var(--color-gray-700);
     --tags-text-color: var(--color-white) !important;
     --tags-text-color--edit: var(--color-white) !important;
     --tag-text-color--edit: var(--color-white);
-    --placeholder-color-focus: rgba(255, 255, 255, 0.5);
     --input-color: var(--color-white) !important;
     --placeholder-color: var(--color-gray-400) !important;
+    --placeholder-color-focus: var(--color-gray-400);
     padding-inline: calc(var(--spacing) * 4) !important;
     padding-block: calc(var(--spacing) * 3) !important;
     --loader-size: 32px;
@@ -27,24 +40,13 @@ tags.tagify--focus {
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
 }
 
-tags.tagify:hover:not(.tagify--focus):not(.tagify--invalid) {
-    --tags-border-color: var(--color-white) !important;
-    outline-style: none;
-    --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
-    --tw-ring-color: color-mix(in oklab, var(--color-white) 30%, transparent);
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-}
-
 tag.tagify__tag {
-    margin-top: 0;
-    margin-bottom: 0;
-
+    margin: 0 5px 0 0;
 }
 
 tag.tagify__tag>div {
     font-size: 11px;
 }
-
 
 /* Filter by style */
 tags.customTagify.style-tagify {
@@ -74,13 +76,28 @@ tags.customTagify.tag-tagify {
     --tag-border-radius: calc(infinity * 1px);
 }
 
-/* https://github.com/yairEO/tagify#suggestions-dropdown-css-variables */
-:root {
-    --tagify-dd-bg-color: var(--color-gray-800);
-    --tagify-dd-text-color: var(--color-white);
-    --tagify-dd-color-primary: var(--color-gray-600);
+/*************************/
+/*   Search bar tagify   */
+/*************************/
+
+tags.searchBarTagify {
+    max-height: 47px;
 }
 
-button {
-    cursor: pointer;
+tags.searchBarTagify.tagify:hover:not(.tagify--focus):not(.tagify--invalid) {
+    --tags-border-color: var(--color-white) !important;
+    outline-style: none;
+    --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+    --tw-ring-color: color-mix(in oklab, var(--color-white) 30%, transparent);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+
+/*************************/
+/*   add track tagify    */
+/*************************/
+
+tags.addTrackTagify.tagify:hover:not(.tagify--focus):not(.tagify--invalid) {
+    --tags-border-color: var(--color-gray-700);
+    outline-style: none;
 }

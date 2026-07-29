@@ -123,10 +123,6 @@
             instances.forEach((instance) => instance.destroy());
         };
     });
-
-    $effect(() => {
-        // Filter sounds based on search query
-    });
 </script>
 
 <div class="min-h-screen bg-gray-950">
@@ -205,7 +201,7 @@
                                 id="tag-filter"
                                 name="tag-filter"
                                 placeholder="Add tags"
-                                class="customTagify tag-tagify {searchInputClasses}"
+                                class="customTagify searchBarTagify tag-tagify {searchInputClasses}"
                             />
                         </div>
 
@@ -221,7 +217,7 @@
                                 id="style-filter"
                                 name="style-filter"
                                 placeholder="Add styles"
-                                class="customTagify style-tagify {searchInputClasses}"
+                                class="customTagify searchBarTagify style-tagify {searchInputClasses}"
                             />
                         </div>
 
