@@ -19,9 +19,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     // Get all unique authors, styles and tags
     for (const track of allTracks) {
-        if (track.author && !allUniqueAuthors.includes(track.author)) {
-            allUniqueAuthors.push(track.author);
-        }
+        allUniqueAuthors.push(...track.authors.filter( (author) => !allUniqueAuthors.includes(author)));
         if(track.styles && track.styles.length > 0) {
             allUniqueStyles.push(...track.styles.filter((style) => !allUniqueStyles.includes(style)));
         }
@@ -44,7 +42,7 @@ export const actions: Actions = {
 
         const formData = await request.formData();
         const title = String(formData.get('title') ?? '').trim();
-        const author = String(formData.get('author') ?? '').trim();
+        const authors = String(formData.get('author') ?? '').trim();
         const description = String(formData.get('description') ?? '').trim();
         const uploadedAt = String(formData.get('uploadedAt') ?? '').trim();
         const bpm = String(formData.get('bpm') ?? '').trim();
@@ -59,7 +57,7 @@ export const actions: Actions = {
             return fail(400, { error: 'Title is required.' });
         }
 
-        if (!author) {
+        if (!authors) {
             return fail(400, { error: 'Author is required.' });
         }
 
@@ -125,7 +123,7 @@ export const actions: Actions = {
         try {
             await createTrack({
                 title,
-                author,
+                authors: authors.split(',').map((author) => author.trim()).filter(Boolean),
                 description: description || null,
                 uploadedAt: uploadedAt ? new Date(uploadedAt) : null,
                 bpm: bpm ? Number(bpm) : null,

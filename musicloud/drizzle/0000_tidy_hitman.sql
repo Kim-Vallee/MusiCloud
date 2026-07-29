@@ -1,7 +1,7 @@
 CREATE TABLE `music` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`title` text NOT NULL,
-	`author` text DEFAULT 'Tachyon' NOT NULL,
+	`authors` text DEFAULT '["Tachyon"]' NOT NULL,
 	`description` text,
 	`uploaded_at` integer NOT NULL,
 	`bpm` integer,

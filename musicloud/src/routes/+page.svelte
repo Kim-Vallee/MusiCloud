@@ -16,8 +16,8 @@
 
     let searchQuery = $state("");
 
-    let tagFilterInput: HTMLInputElement | undefined;
-    let styleFilterInput: HTMLInputElement | undefined;
+    let tagFilterInput: HTMLInputElement | undefined = $state(undefined);
+    let styleFilterInput: HTMLInputElement | undefined = $state(undefined);
 
     let allTags = $derived(data.allTags);
     let allStyles = $derived(data.allStyles);
@@ -271,7 +271,7 @@
                                     {track.title}
                                 </a>
                                 <p class="text-sm text-gray-400 truncate">
-                                    by {track.author}
+                                    by {track.authors}
                                 </p>
                             </div>
 

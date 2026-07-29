@@ -120,7 +120,7 @@
                                 {data.track.title}
                             </h2>
                             <p class="text-sm text-gray-400 mt-2">
-                                by {data.track.author}
+                                by {data.track.authors}
                             </p>
                         </div>
                     </div>

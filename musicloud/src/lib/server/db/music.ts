@@ -1,3 +1,4 @@
+import type { SQLiteSelect } from "drizzle-orm/sqlite-core";
 import { db } from ".";
 import { music } from "./schema";
 import { eq, like, and, sql, gte, lte, desc } from "drizzle-orm";
@@ -5,7 +6,7 @@ import { eq, like, and, sql, gte, lte, desc } from "drizzle-orm";
 export type Track = {
     id: number;
     title: string;
-    author: string;
+    authors: string[];
     description?: string | null;
     uploadedAt?: Date | null;
     bpm?: number | null;
@@ -17,15 +18,35 @@ export type Track = {
     duration: number;
 };
 
-export const getAllTracks = (showAll: boolean) => {
+function paginate<T extends SQLiteSelect>(
+    qb: T,
+    page: number = 1,
+    pageSize: number = 10,
+) {
+    return qb.limit(pageSize).offset((page - 1) * pageSize);
+}
+
+export const getAllTracks = (showAll: boolean, page?: number, pageSize: number = 10) => {
+    // Start with base query (no need for .$dynamic() when reassigning)
+    let query = db.select().from(music).$dynamic();
+
+    // Apply visibility filter only if needed
     if (!showAll) {
-        return db.select().from(music).orderBy(desc(music.uploadedAt)).where(eq(music.hidden, false)).all();
+        query = query.where(eq(music.hidden, false));
     }
-    return db.select().from(music).orderBy(desc(music.uploadedAt)).all();
+
+    // Always order by upload date
+    query = query.orderBy(desc(music.uploadedAt));
+
+    // Apply pagination only if a valid page number is provided
+    if (page !== undefined && page > 0) {
+        query = paginate(query, page, pageSize);
+    }
+
+    return query.all();
 }
 
 export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
-export const getTrackByAuthor = (author: string) => db.select().from(music).where(eq(music.author, author)).all();
 export const getTrackByBPM = (bpm: number) => db.select().from(music).where(eq(music.bpm, bpm)).all();
 export const getTrackById = (id: number) => db.select().from(music).where(eq(music.id, id)).all()[0] ?? null;
 
@@ -45,7 +66,7 @@ export const showTrackById = async (id: number) => {
 
 export const updateTrackById = async (id: number, input: {
     title: string;
-    author: string;
+    authors: string[];
     description?: string | null;
     bpm?: number | null;
     styles?: string[] | null;
@@ -60,7 +81,7 @@ export const updateTrackById = async (id: number, input: {
     return db.update(music)
         .set({
             title: input.title.trim(),
-            author: input.author?.trim() || 'Tachyon',
+            authors: input.authors,
             description: input.description?.trim() || null,
             bpm: input.bpm ?? null,
             styles,
@@ -84,7 +105,7 @@ export const deleteTrackById = async (id: number) => {
 
 export const createTrack = async (input: {
     title: string;
-    author: string;
+    authors: string[];
     description?: string | null;
     uploadedAt?: Date | null;
     bpm?: number | null;
@@ -99,7 +120,7 @@ export const createTrack = async (input: {
 
     return db.insert(music).values({
         title: input.title.trim(),
-        author: input.author?.trim() || 'Tachyon',
+        authors: input.authors,
         description: input.description?.trim() || null,
         uploadedAt: input.uploadedAt ?? new Date(),
         bpm: input.bpm ?? null,

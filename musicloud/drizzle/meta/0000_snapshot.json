@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "40b20dbf-191f-452e-bbfa-e439ae1bc5dc",
+  "id": "46730459-1861-4c39-ac79-5bc757a0b280",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "music": {
@@ -21,13 +21,13 @@
           "notNull": true,
           "autoincrement": false
         },
-        "author": {
-          "name": "author",
+        "authors": {
+          "name": "authors",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'Tachyon'"
+          "default": "'[\"Tachyon\"]'"
         },
         "description": {
           "name": "description",

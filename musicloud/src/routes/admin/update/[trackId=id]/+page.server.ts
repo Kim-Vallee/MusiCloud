@@ -1,6 +1,6 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getTrackById, updateTrackById } from '$lib/server/db/music';
+import { getAllTracks, getTrackById, updateTrackById } from '$lib/server/db/music';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getAudioDir, getAudioPath } from '$lib/assets';
@@ -18,12 +18,28 @@ export const load: PageServerLoad = async ({ locals, params }) => {
         throw error(404, 'Track not found');
     }
 
+    const allTracks = getAllTracks(true);
+    let allUniqueAuthors: string[] = [];
+    let allUniqueStyles: string[] = [];
+    let allUniqueTags: string[] = [];
+
+    // Get all unique authors, styles and tags
+    for (const track of allTracks) {
+        allUniqueAuthors.push(...track.authors.filter((author) => !allUniqueAuthors.includes(author)));
+        if (track.styles && track.styles.length > 0) {
+            allUniqueStyles.push(...track.styles.filter((style) => !allUniqueStyles.includes(style)));
+        }
+        if (track.tags && track.tags.length > 0) {
+            allUniqueTags.push(...track.tags.filter((tag) => !allUniqueTags.includes(tag)));
+        }
+    }
+
+
     return {
-        track: {
-            ...track,
-            styles: track.styles ?? [],
-            tags: track.tags ?? [],
-        },
+        track: track,
+        allUniqueAuthors: allUniqueAuthors.sort(),
+        allUniqueStyles: allUniqueStyles.sort(),
+        allUniqueTags: allUniqueTags.sort()
     };
 };
 
@@ -42,7 +58,7 @@ export const actions: Actions = {
 
         const formData = await request.formData();
         const title = String(formData.get('title') ?? '').trim();
-        const author = String(formData.get('author') ?? '').trim();
+        const authors = String(formData.get('author') ?? '').trim();
         const description = String(formData.get('description') ?? '').trim();
         const bpm = String(formData.get('bpm') ?? '').trim();
         const styles = String(formData.get('styles') ?? '').trim();
@@ -56,7 +72,7 @@ export const actions: Actions = {
             return fail(400, { error: 'Title is required.' });
         }
 
-        if (!author) {
+        if (!authors) {
             return fail(400, { error: 'Author is required.' });
         }
 
@@ -111,12 +127,21 @@ export const actions: Actions = {
                 console.log(err);
                 return fail(500, { error: 'Internal error while computing the duration.' });
             }
+
+            try {
+                // Delete old file
+                const filePathToDelete = getAudioPath(existingTrack.audioFile);
+                await rm(filePathToDelete);
+            } catch (err) {
+                console.log(err);
+                return fail(500, { error: 'Internal error while deleting the file.' });
+            }
         }
 
         try {
             await updateTrackById(trackId, {
                 title,
-                author,
+                authors: authors.split(',').map((author) => author.trim()).filter(Boolean),
                 description: description || null,
                 bpm: bpm ? Number(bpm) : null,
                 styles: styles
@@ -132,14 +157,11 @@ export const actions: Actions = {
                 duration,
             });
 
-            // Delete old file
-            const filePathToDelete = getAudioPath(existingTrack.audioFile);
-            await rm(filePathToDelete);
 
             return { success: true, message: 'Track updated successfully.' };
         } catch (err) {
             console.log(err);
-            
+
             return fail(500, { error: 'Unable to update the track right now.' });
         }
     },

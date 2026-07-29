@@ -13,6 +13,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     for (const [key, value] of URLparams.entries()) {
         if (!value.trim()) {
             URLparams.delete(key);
+        } else if (key === "p" && value == "0") {
+            URLparams.delete(key);
         }
     }
 
@@ -25,6 +27,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         throw redirect(303, `/?${cleanUrl}`);
     }
 
+    // Working on pagination
+    let page = url.searchParams.get("p");
 
     let allTracks = getAllTracks(isAuthenticated);
     const uniqueTags = new Set<string>();
@@ -67,7 +71,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         if (
             titleAuthorSearch &&
             !track.title.toLowerCase().includes(titleAuthorSearch) &&
-            !track.author.toLowerCase().includes(titleAuthorSearch)
+            track.authors.filter((author) => author.toLowerCase().includes(titleAuthorSearch)).length === 0
         ) {
             return false;
         }

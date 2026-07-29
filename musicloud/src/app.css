@@ -96,6 +96,9 @@ tags.searchBarTagify.tagify:hover:not(.tagify--focus):not(.tagify--invalid) {
 /*************************/
 /*   add track tagify    */
 /*************************/
+tags.addTrackTagify {
+    max-height: 45px;
+}
 
 tags.addTrackTagify.tagify:hover:not(.tagify--focus):not(.tagify--invalid) {
     --tags-border-color: var(--color-gray-700);

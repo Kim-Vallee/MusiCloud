@@ -189,12 +189,11 @@
                         ></textarea>
                     </div>
 
-                    <div
+                    <label
                         class="block text-sm font-medium text-gray-300 md:col-span-2"
+                        for="audiofile"
                     >
-                        <label class="mb-2 block" for="audiofile"
-                            >Audio file</label
-                        >
+                        <span class="mb-2 block">Audio file</span>
                         <div
                             class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-600 bg-gray-800/70 px-6 py-8 text-center transition hover:border-blue-500 hover:bg-gray-800"
                         >
@@ -237,7 +236,7 @@
                                 Selected: {selectedFileName}
                             </p>
                         {/if}
-                    </div>
+                    </label>
 
                     <div
                         class="block text-sm font-medium text-gray-300 md:col-span-2"
