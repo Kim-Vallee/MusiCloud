@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from "./$types";
-import { deleteTrackById, getAllTracks, getTrackById, hideTrackById, showTrackById, type Track } from "$lib/server/db/music";
+import { deleteTrackById, getAllTags, getAllStyles, getTrackById, getTracksWithQuery, hideTrackById, showTrackById, type Track } from "$lib/server/db/music";
 import { error, fail, redirect } from "@sveltejs/kit";
 import { getAudioPath } from "$lib/assets";
 import { rm } from "node:fs/promises";
@@ -13,9 +13,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     for (const [key, value] of URLparams.entries()) {
         if (!value.trim()) {
             URLparams.delete(key);
-        } else if (key === "p" && value == "0") {
-            URLparams.delete(key);
         }
+    }
+
+    // Validating the page
+    const page_parameter = URLparams.get("p") || "0";
+    const page_as_int = Number.parseInt(page_parameter);
+    if ( Number.isNaN(page_as_int) || page_as_int <= 1) {
+        URLparams.delete("p");
     }
 
     const cleanUrl = URLparams.toString();
@@ -27,32 +32,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         throw redirect(303, `/?${cleanUrl}`);
     }
 
-    // Working on pagination
-    let page = url.searchParams.get("p");
-
-    let allTracks = getAllTracks(isAuthenticated);
-    const uniqueTags = new Set<string>();
-    const uniqueStyles = new Set<string>();
-
-    for (const track of allTracks) {
-        for (const tag of track.tags ?? []) {
-            if (tag) {
-                uniqueTags.add(tag);
-            }
-        }
-        for (const style of track.styles ?? []) {
-            if (style) {
-                uniqueStyles.add(style);
-            }
-        }
-    }
-
-    let allTags = Array.from(uniqueTags);
-    let allStyles = Array.from(uniqueStyles);
-
-    allTags.sort()
-    allStyles.sort()
-
+    const current_page = Number.parseInt(url.searchParams.get("p") ?? "1");
 
     // Filter tracks by search params
     const titleAuthorSearch = (url.searchParams.get("title-author-search") ?? "").toLowerCase();
@@ -67,28 +47,21 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         .map((s) => s.trim())
         .filter(Boolean);
 
-    allTracks = allTracks.filter((track) => {
-        if (
-            titleAuthorSearch &&
-            !track.title.toLowerCase().includes(titleAuthorSearch) &&
-            track.authors.filter((author) => author.toLowerCase().includes(titleAuthorSearch)).length === 0
-        ) {
-            return false;
-        }
+    const { tracks, total, totalPages } = await getTracksWithQuery(titleAuthorSearch, tagsSearch, styleSearch, page_as_int, 10, isAuthenticated);
+    
+    if (totalPages < page_as_int) {
+        // Then set page to 1 and reset
+        url.searchParams.delete("p");
+        throw redirect(303, `/?${url.searchParams.toString()}`);
+    }
 
-        if (!tagsSearch.every((tag) => track.tags?.includes(tag))) {
-            return false;
-        }
+    const allTags = await getAllTags(isAuthenticated);
 
-        if (!styleSearch.every((style) => track.styles?.includes(style))) {
-            return false;
-        }
-
-        return true;
-    });
+    const allStyles = await getAllStyles(isAuthenticated);
 
     return {
-        tracks: allTracks,
+        tracks: tracks,
+        currentPage: current_page,
         allTags: allTags,
         allStyles: allStyles,
         isAuthenticated: isAuthenticated,

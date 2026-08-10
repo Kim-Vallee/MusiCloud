@@ -9,7 +9,7 @@ import {
     musicStyles,
     musicTags
 } from "./schema";
-import { eq, like, and, sql, gte, lte, desc } from "drizzle-orm";
+import { eq, like, desc, or, sql, exists, and, count } from "drizzle-orm";
 
 export type Track = {
     id: number;
@@ -34,6 +34,119 @@ function paginate<T extends SQLiteSelect>(
     return qb.limit(pageSize).offset((page - 1) * pageSize);
 }
 
+export const getTracksWithQuery = async (
+    titleAuthor: string,
+    tagNames: string[],
+    styleNames: string[],
+    page: number = 1,
+    pageSize: number = 10,
+    showHidden: boolean = false) => {
+    const conditions = [];
+
+    if (titleAuthor.trim() != '') {
+        const search = `%${titleAuthor.trim().toLowerCase()}%`;
+
+        conditions.push(
+            or(
+                like(sql`lower(${music.title})`, search),
+                exists(
+                    db.select({ one: sql`1` })
+                        .from(musicAuthors)
+                        .innerJoin(authors, eq(musicAuthors.authorId, authors.id))
+                        .where(
+                            and(
+                                eq(musicAuthors.musicId, music.id),
+                                like(sql`lower(${authors.name})`, search)
+                            )
+                        )
+                )
+            )
+        );
+    }
+
+    for (const tagName of tagNames) {
+        conditions.push(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(musicTags)
+                    .innerJoin(tags, eq(musicTags.tagId, tags.id))
+                    .where(
+                        and(
+                            eq(musicTags.musicId, music.id),
+                            eq(tags.name, tagName)
+                        )
+                    )
+            )
+        );
+    }
+
+    for (const styleName of styleNames) {
+        conditions.push(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(musicStyles)
+                    .innerJoin(styles, eq(musicStyles.styleId, styles.id))
+                    .where(
+                        and(
+                            eq(musicStyles.musicId, music.id),
+                            eq(styles.name, styleName)
+                        )
+                    )
+            )
+        );
+    }
+
+    if (!showHidden) {
+        conditions.push(eq(music.hidden, false));
+    }
+
+    const offset = Math.max(0, page - 1) * pageSize;
+
+    const tracks = await db.select().from(music).where(and(...conditions)).orderBy(sql`${music.uploadedAt} DESC`).limit(pageSize).offset(offset);
+
+    const [{ total }] = await db.select({ total: count() }).from(music).where(and(...conditions));
+
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+        tracks,
+        total,
+        page,
+        pageSize,
+        totalPages
+    }
+}
+
+export const getAllTags = (
+    showHidden: boolean = false
+) => {
+
+    let sql_query = db.select().from(tags).$dynamic();
+
+    if (!showHidden) {
+        sql_query = sql_query.where(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(musicTags)
+                    .innerJoin(music, eq(musicTags.tagId, tags.id))
+                    .where(
+                        and(
+                            eq(musicTags.tagId, tags.id),
+                            eq(music.hidden, false)
+                        ))
+            )
+        );
+    }
+
+    return sql_query.all();
+}
+
+export const getAllStyles = async (
+    showHidden: boolean = false
+) => {
+
+}
+
 export const getAllTracks = (showAll: boolean, page?: number, pageSize: number = 10) => {
     // Start with base query (no need for .$dynamic() when reassigning)
     let query = db.select().from(music).$dynamic();
@@ -52,21 +165,6 @@ export const getAllTracks = (showAll: boolean, page?: number, pageSize: number =
     }
 
     return query.all();
-}
-
-export const getTracksByTags = (tags: string) => {
-    const array_tags = tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean);
-
-    if (array_tags.length === 0) return [];
-
-    const conditions = array_tags.map((tag) =>
-        sql`EXISTS (SELECT 1 FROM json_each(${music.tags}) WHERE value = ${tag})`
-    );
-
-    return db.select().from(music).where(and(...conditions)).all();
 }
 
 export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
@@ -209,7 +307,7 @@ export const createTrack = async (input: {
     const tagsToInsert = input.tags?.filter(Boolean) ?? [];
     const stylesToInsert = input.styles?.filter(Boolean) ?? [];
 
-    return await db.transaction(() => {
+    return db.transaction(() => {
         const [newTrack] = db.insert(music).values({
             title: input.title.trim(),
             description: input.description?.trim() || null,
