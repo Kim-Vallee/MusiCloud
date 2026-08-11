@@ -236,6 +236,33 @@ export const getTrackById = async (id: number, showHidden: boolean) => {
         }
     });
 }
+
+export const getTrackByFilename = async (filename: string, showHidden: boolean) => {
+    if (showHidden) {
+        return db.query.music.findFirst({
+            where: {
+                audioFile: {
+                    eq: filename
+                },
+            },
+            columns: {
+                id: true
+            }
+        });
+    }
+    return db.query.music.findFirst({
+        where: {
+            audioFile: {
+                eq: filename
+            },
+            hidden: false
+        },
+        columns: {
+            id: true
+        }
+    });
+}
+
 export const hideTrackById = async (id: number) => {
     return db.update(music)
         .set({
@@ -381,7 +408,7 @@ export const updateTrackById = async (id: number, input: {
 
 export const deleteTrackById = async (id: number) => {
     return db.transaction(() => {
-    
+
         const [track] = db.delete(music).where(eq(music.id, id)).returning().all();
 
         if (!track) {
