@@ -70,7 +70,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
     delete_track: async ({ locals, request }) => {
-        if (!locals.user) {
+        const isAuthenticated = Boolean(locals.user);
+        if (!isAuthenticated) {
             throw error(403, 'You must be authenticated to delete a track');
         }
 

@@ -380,10 +380,49 @@ export const updateTrackById = async (id: number, input: {
 };
 
 export const deleteTrackById = async (id: number) => {
-    const track = await db.delete(music).where(eq(music.id, id)).returning();
+    return db.transaction(() => {
+    
+        const [track] = db.delete(music).where(eq(music.id, id)).returning().all();
 
-    return track[0] ?? null;
+        if (!track) {
+            return null;
+        }
 
+        // Delete orphaned authors
+        db.delete(authors)
+            .where(
+                notExists(
+                    db.select({ one: sql`1` })
+                        .from(musicAuthors)
+                        .where(eq(musicAuthors.authorId, authors.id))
+                )
+            )
+            .run();
+
+        // Delete orphaned styles
+        db.delete(styles)
+            .where(
+                notExists(
+                    db.select({ one: sql`1` })
+                        .from(musicStyles)
+                        .where(eq(musicStyles.styleId, styles.id))
+                )
+            )
+            .run();
+
+        // Delete orphaned tags
+        db.delete(tags)
+            .where(
+                notExists(
+                    db.select({ one: sql`1` })
+                        .from(musicTags)
+                        .where(eq(musicTags.tagId, tags.id))
+                )
+            )
+            .run();
+
+        return track;
+    });
 }
 
 export const createTrack = async (input: {
