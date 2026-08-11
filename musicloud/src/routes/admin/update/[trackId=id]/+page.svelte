@@ -20,8 +20,6 @@
         'w-full rounded-lg border border-gray-700 bg-gray-800/80 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30';
 
     const track = $derived(data.track);
-    const stylesValue = $derived((track.styles ?? []).join(', '));
-    const tagsValue = $derived((track.tags ?? []).join(', '));
 
     onMount(() => {
         const instances: Array<{ destroy: () => void }> = [];
@@ -33,7 +31,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allTags,
+                    whitelist: allTags.map((tag) => tag.name),
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(','),
                 }),
@@ -47,7 +45,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allStyles,
+                    whitelist: allStyles.map((style) => style.name),
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(','),
                 }),
@@ -61,7 +59,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allAuthors,
+                    whitelist: allAuthors.map((author) => author.name),
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(','),
                 }),
@@ -119,7 +117,7 @@
                                 id="author"
                                 name="author"
                                 required
-                                value={track.authors ?? ''}
+                                value={track.authors.map((a) => a.name).join(',') ?? ''}
                                 class="customTagify addTrackTagify {inputClasses}"
                             />
                         </div>
@@ -148,7 +146,7 @@
                                 bind:this={stylesInput}
                                 name="styles"
                                 id="styles"
-                                value={stylesValue}
+                                value={track.styles.map((s) => s.name).join(',') ?? ''}
                                 class="customTagify addTrackTagify style-tagify {inputClasses}"
                             />
                         </div>
@@ -203,7 +201,7 @@
                                 bind:this={tagsInput}
                                 name="tags"
                                 id="tags"
-                                value={tagsValue}
+                                value={track.tags.map((t) => t.name).join(',')}
                                 class="customTagify addTrackTagify tag-tagify {inputClasses}"
                             />
                         </div>

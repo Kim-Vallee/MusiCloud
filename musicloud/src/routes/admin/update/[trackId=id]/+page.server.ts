@@ -1,56 +1,46 @@
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getAllTracks, getTrackById, updateTrackById } from '$lib/server/db/music';
+import { getAllAuthors, getAllStyles, getAllTags, getTrackById, updateTrackById } from '$lib/server/db/music';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getAudioDir, getAudioPath } from '$lib/assets';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { is } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-    if (!locals.user) {
+    const isAuthenticated = Boolean(locals.user);
+    if (!isAuthenticated) {
         throw error(403, 'You must be authenticated to update a track.');
     }
 
-    const track = getTrackById(Number(params.trackId));
+    const track = await getTrackById(Number(params.trackId), isAuthenticated);
 
     if (!track) {
         throw error(404, 'Track not found');
     }
 
-    const allTracks = getAllTracks(true);
-    let allUniqueAuthors: string[] = [];
-    let allUniqueStyles: string[] = [];
-    let allUniqueTags: string[] = [];
-
-    // Get all unique authors, styles and tags
-    for (const track of allTracks) {
-        allUniqueAuthors.push(...track.authors.filter((author) => !allUniqueAuthors.includes(author)));
-        if (track.styles && track.styles.length > 0) {
-            allUniqueStyles.push(...track.styles.filter((style) => !allUniqueStyles.includes(style)));
-        }
-        if (track.tags && track.tags.length > 0) {
-            allUniqueTags.push(...track.tags.filter((tag) => !allUniqueTags.includes(tag)));
-        }
-    }
-
+    const allTags = getAllTags(isAuthenticated);
+    const allStyles = getAllStyles(isAuthenticated);
+    const allAuthors = getAllAuthors(isAuthenticated);
 
     return {
         track: track,
-        allUniqueAuthors: allUniqueAuthors.sort(),
-        allUniqueStyles: allUniqueStyles.sort(),
-        allUniqueTags: allUniqueTags.sort()
+        allUniqueAuthors: allAuthors,
+        allUniqueStyles: allStyles,
+        allUniqueTags: allAuthors
     };
 };
 
 export const actions: Actions = {
     update_track: async ({ locals, request, params }) => {
-        if (!locals.user) {
+        const isAuthenticated = Boolean(locals.user);
+        if (!isAuthenticated) {
             throw error(403, 'You must be authenticated to update a track.');
         }
 
         const trackId = Number(params.trackId);
-        const existingTrack = getTrackById(trackId);
+        const existingTrack = await getTrackById(trackId, isAuthenticated);
 
         if (!existingTrack) {
             return fail(404, { error: 'Track not found.' });
