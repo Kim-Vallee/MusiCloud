@@ -99,7 +99,8 @@ export const actions: Actions = {
         return { success: true, message: `Track ${deletedTrack.title} (id ${deletedTrack.id}) was deleted successfully.` };
     },
     hide_track: async ({ locals, request }) => {
-        if (!locals.user) {
+        const isAuthenticated = Boolean(locals.user);
+        if (!isAuthenticated) {
             throw error(403, 'You must be authenticated to change the visibility of a track');
         }
 
@@ -110,7 +111,7 @@ export const actions: Actions = {
             return fail(400, { error: 'Track Id is not valid' });
         }
 
-        const track = getTrackById(trackId);
+        const track = await getTrackById(trackId, true);
 
         if (!track) {
             return fail(400, { error: "No track corresponding to this Id" });

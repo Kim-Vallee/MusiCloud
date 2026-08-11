@@ -6,7 +6,6 @@ import { join } from 'node:path';
 import { getAudioDir, getAudioPath } from '$lib/assets';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { is } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
     const isAuthenticated = Boolean(locals.user);
@@ -28,7 +27,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
         track: track,
         allUniqueAuthors: allAuthors,
         allUniqueStyles: allStyles,
-        allUniqueTags: allAuthors
+        allUniqueTags: allTags
     };
 };
 

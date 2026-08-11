@@ -8,7 +8,7 @@ import {
     musicStyles,
     musicTags
 } from "./schema";
-import { eq, like, desc, or, sql, exists, and, count, SQL } from "drizzle-orm";
+import { eq, like, desc, or, sql, exists, and, count, SQL, notExists } from "drizzle-orm";
 
 export type Track = {
     id: number;
@@ -315,6 +315,16 @@ export const updateTrackById = async (id: number, input: {
                     authorId,
                 }).onConflictDoNothing().run();
             }
+
+            // Delete orphaned authors
+            db.delete(authors).where(
+                notExists(
+                    db.select({ one: sql`1` })
+                        .from(musicAuthors)
+                        .where(eq(musicAuthors.authorId, authors.id))
+                )
+            )
+                .run();
         }
 
         // 3. Replace styles
@@ -328,6 +338,17 @@ export const updateTrackById = async (id: number, input: {
                     styleId,
                 }).onConflictDoNothing().run();
             }
+
+            // Delete orphaned styles
+            db.delete(styles)
+                .where(
+                    notExists(
+                        db.select({ one: sql`1` })
+                            .from(musicStyles)
+                            .where(eq(musicStyles.styleId, styles.id))
+                    )
+                )
+                .run();
         }
 
         // 4. Replace tags
@@ -341,6 +362,17 @@ export const updateTrackById = async (id: number, input: {
                     tagId,
                 }).onConflictDoNothing().run();
             }
+
+            // Delete orphaned tags
+            db.delete(tags)
+                .where(
+                    notExists(
+                        db.select({ one: sql`1` })
+                            .from(musicTags)
+                            .where(eq(musicTags.tagId, tags.id))
+                    )
+                )
+                .run();
         }
 
         return id;
