@@ -207,8 +207,35 @@ export const getAllStyles = (
     return sql_query.all();
 }
 
-export const getTrackById = (id: number) => db.select().from(music).where(eq(music.id, id)).all()[0] ?? null;
-
+export const getTrackById = async (id: number, showHidden: boolean) => {
+    if (showHidden) {
+        return db.query.music.findFirst({
+            where: {
+                id: {
+                    eq: id
+                },
+            },
+            with: {
+                tags: true,
+                styles: true,
+                authors: true
+            }
+        });
+    }
+    return db.query.music.findFirst({
+        where: {
+            id: {
+                eq: id
+            },
+            hidden: false
+        },
+        with: {
+            tags: true,
+            styles: true,
+            authors: true
+        }
+    });
+}
 export const hideTrackById = async (id: number) => {
     return db.update(music)
         .set({

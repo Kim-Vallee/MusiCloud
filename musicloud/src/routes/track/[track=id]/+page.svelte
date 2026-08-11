@@ -3,11 +3,6 @@
 
     import type { PageProps } from "./$types";
 
-    const audioAssets = import.meta.glob("../../../lib/audio/*.{mp3,wav,ogg}", {
-        eager: true,
-        import: "default",
-    }) as Record<string, string>;
-
     let { data }: PageProps = $props();
 
     let wavesurfer: WaveSurfer;
@@ -120,7 +115,7 @@
                                 {data.track.title}
                             </h2>
                             <p class="text-sm text-gray-400 mt-2">
-                                by {data.track.authors}
+                                by {data.track.authors.map((author) => author.name).join(', ')}
                             </p>
                         </div>
                     </div>
@@ -165,7 +160,7 @@
                                         <span
                                             class="text-[11px] px-2 py-1 mx-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50"
                                         >
-                                            {style}
+                                            {style.name}
                                         </span>
                                     {/each}
                                 </div>
@@ -175,7 +170,7 @@
                                         <span
                                             class="text-[11px] px-2 py-1 mx-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
                                         >
-                                            {tag}
+                                            {tag.name}
                                         </span>
                                     {/each}
                                 </div>

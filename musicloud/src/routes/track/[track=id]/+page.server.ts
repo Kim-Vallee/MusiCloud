@@ -3,7 +3,8 @@ import { getTrackById } from "$lib/server/db/music";
 import { error } from '@sveltejs/kit'
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-    let track = getTrackById(Number(params.track));
+    let isAuthenticated = Boolean(locals.user);
+    let track = await getTrackById(Number(params.track), isAuthenticated);
     if (!track) {
         error(404, {
             message: 'Track does not exist'
@@ -14,6 +15,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
             ...track,
             audioUrl: `/content/${track.audioFile}`,
         },
-        isAuthenticated: Boolean(locals.user),
+        isAuthenticated: isAuthenticated,
     };
 };
