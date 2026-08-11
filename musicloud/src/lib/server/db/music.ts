@@ -1,4 +1,3 @@
-import type { SQLiteSelect } from "drizzle-orm/sqlite-core";
 import { db } from ".";
 import {
     music,
@@ -9,30 +8,22 @@ import {
     musicStyles,
     musicTags
 } from "./schema";
-import { eq, like, desc, or, sql, exists, and, count } from "drizzle-orm";
+import { eq, like, desc, or, sql, exists, and, count, SQL } from "drizzle-orm";
 
 export type Track = {
     id: number;
     title: string;
-    authors: string[];
+    authors: {id: number, name: string}[];
     description?: string | null;
     uploadedAt?: Date | null;
     bpm?: number | null;
-    styles?: string[] | null;
+    styles?: {id: number, name: string}[];
     hidden: boolean;
     setup?: string | null;
-    tags?: string[] | null;
+    tags?: {id: number, name: string}[];
     audioFile: string;
     duration: number;
 };
-
-function paginate<T extends SQLiteSelect>(
-    qb: T,
-    page: number = 1,
-    pageSize: number = 10,
-) {
-    return qb.limit(pageSize).offset((page - 1) * pageSize);
-}
 
 export const getTracksWithQuery = async (
     titleAuthor: string,
@@ -41,27 +32,27 @@ export const getTracksWithQuery = async (
     page: number = 1,
     pageSize: number = 10,
     showHidden: boolean = false) => {
-    const conditions = [];
+    const conditions: SQL[] = [];
 
     if (titleAuthor.trim() != '') {
         const search = `%${titleAuthor.trim().toLowerCase()}%`;
 
-        conditions.push(
-            or(
-                like(sql`lower(${music.title})`, search),
-                exists(
-                    db.select({ one: sql`1` })
-                        .from(musicAuthors)
-                        .innerJoin(authors, eq(musicAuthors.authorId, authors.id))
-                        .where(
-                            and(
-                                eq(musicAuthors.musicId, music.id),
-                                like(sql`lower(${authors.name})`, search)
-                            )
+        const condition = or(
+            like(sql`lower(${music.title})`, search),
+            exists(
+                db.select({ one: sql`1` })
+                    .from(musicAuthors)
+                    .innerJoin(authors, eq(musicAuthors.authorId, authors.id))
+                    .where(
+                        and(
+                            eq(musicAuthors.musicId, music.id),
+                            like(sql`lower(${authors.name})`, search)
                         )
-                )
+                    )
             )
         );
+
+        if (condition) conditions.push(condition);
     }
 
     for (const tagName of tagNames) {
@@ -102,11 +93,39 @@ export const getTracksWithQuery = async (
 
     const offset = Math.max(0, page - 1) * pageSize;
 
-    const tracks = await db.select().from(music).where(and(...conditions)).orderBy(sql`${music.uploadedAt} DESC`).limit(pageSize).offset(offset);
+    const matching_tracks = await db.select({ id: music.id }).from(music).where(and(...conditions)).orderBy(desc(music.uploadedAt)).limit(pageSize).offset(offset);
+    const ids = matching_tracks.map((track) => track.id);
 
     const [{ total }] = await db.select({ total: count() }).from(music).where(and(...conditions));
 
     const totalPages = Math.ceil(total / pageSize);
+
+    if (ids.length === 0) {
+        return {
+            tracks: [],
+            total,
+            page,
+            pageSize,
+            totalPages
+        }
+    }
+
+    const tracks = await db.query.music.findMany({
+        where: {
+            id: {
+                in: ids
+            }
+        },
+        with: {
+            tags: true,
+            styles: true,
+            authors: true
+        },
+
+        orderBy: (music, { desc }) => [
+            desc(music.uploadedAt)
+        ],
+    });
 
     return {
         tracks,
@@ -128,7 +147,7 @@ export const getAllTags = (
             exists(
                 db.select({ one: sql`1` })
                     .from(musicTags)
-                    .innerJoin(music, eq(musicTags.tagId, tags.id))
+                    .innerJoin(music, eq(musicTags.musicId, music.id))
                     .where(
                         and(
                             eq(musicTags.tagId, tags.id),
@@ -141,33 +160,29 @@ export const getAllTags = (
     return sql_query.all();
 }
 
-export const getAllStyles = async (
+export const getAllStyles = (
     showHidden: boolean = false
 ) => {
+    let sql_query = db.select().from(styles).$dynamic();
 
-}
-
-export const getAllTracks = (showAll: boolean, page?: number, pageSize: number = 10) => {
-    // Start with base query (no need for .$dynamic() when reassigning)
-    let query = db.select().from(music).$dynamic();
-
-    // Apply visibility filter only if needed
-    if (!showAll) {
-        query = query.where(eq(music.hidden, false));
+    if (!showHidden) {
+        sql_query = sql_query.where(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(musicStyles)
+                    .innerJoin(music, eq(musicStyles.musicId, music.id))
+                    .where(
+                        and(
+                            eq(musicStyles.styleId, styles.id),
+                            eq(music.hidden, false)
+                        )
+                    )
+            )
+        );
     }
 
-    // Always order by upload date
-    query = query.orderBy(desc(music.uploadedAt));
-
-    // Apply pagination only if a valid page number is provided
-    if (page !== undefined && page > 0) {
-        query = paginate(query, page, pageSize);
-    }
-
-    return query.all();
+    return sql_query.all();
 }
-
-export const getTrackByTitle = (title: string) => db.select().from(music).where(like(music.title, '%' + title + '%')).all();
 
 export const getTrackById = (id: number) => db.select().from(music).where(eq(music.id, id)).all()[0] ?? null;
 
@@ -284,10 +299,8 @@ export const updateTrackById = async (id: number, input: {
 
 export const deleteTrackById = async (id: number) => {
     const track = await db.delete(music).where(eq(music.id, id)).returning();
-    if (!track) {
-        return false;
-    }
-    return track[0];
+    
+    return track[0] ?? null;
 
 }
 
