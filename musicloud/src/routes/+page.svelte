@@ -96,7 +96,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allTags,
+                    whitelist: allTags.map((tag) => tag.name),
                     enforceWhitelist: true,
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(","),
@@ -111,7 +111,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allStyles,
+                    whitelist: allStyles.map((style) => style.name),
                     enforceWhitelist: true,
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(","),
@@ -271,7 +271,7 @@
                                     {track.title}
                                 </a>
                                 <p class="text-sm text-gray-400 truncate">
-                                    by {track.authors}
+                                    by { track.authors.map((author) => author.name).join(", ") }
                                 </p>
                             </div>
 
@@ -280,7 +280,7 @@
                                     <span
                                         class="text-[11px] px-2 py-1 bg-blue-900/50 text-blue-300 rounded-full border border-blue-700/50"
                                     >
-                                        {tag}
+                                        {tag.name}
                                     </span>
                                 {/each}
                             </div>
@@ -309,7 +309,7 @@
                                         <span
                                             class="text-[11px] px-2 py-1 bg-purple-900/50 text-purple-300 rounded-full border border-purple-700/50"
                                         >
-                                            {style}
+                                            {style.name}
                                         </span>
                                     {/each}
                                 </div>
