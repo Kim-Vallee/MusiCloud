@@ -1,6 +1,6 @@
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { createTrack, getAllTracks } from '$lib/server/db/music';
+import { createTrack, getAllAuthors, getAllStyles, getAllTags } from '$lib/server/db/music';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getAudioDir } from '$lib/assets';
@@ -12,25 +12,14 @@ export const load: PageServerLoad = async ({ locals }) => {
         throw error(403, 'You must be authenticated to add a track.');
     }
 
-    const allTracks = getAllTracks(true);
-    let allUniqueAuthors: string[] = [];
-    let allUniqueStyles: string[] = [];
-    let allUniqueTags: string[] = [];
+    const allAuthors = getAllAuthors();
+    const allStyles = getAllStyles();
+    const allTags = getAllTags();
 
-    // Get all unique authors, styles and tags
-    for (const track of allTracks) {
-        allUniqueAuthors.push(...track.authors.filter( (author) => !allUniqueAuthors.includes(author)));
-        if(track.styles && track.styles.length > 0) {
-            allUniqueStyles.push(...track.styles.filter((style) => !allUniqueStyles.includes(style)));
-        }
-        if(track.tags && track.tags.length > 0) {
-            allUniqueTags.push(...track.tags.filter((tag) => !allUniqueTags.includes(tag)));
-        }
-    }
     return {
-        allUniqueAuthors: allUniqueAuthors.sort(),
-        allUniqueStyles: allUniqueStyles.sort(),
-        allUniqueTags: allUniqueTags.sort()
+        allUniqueAuthors: allAuthors,
+        allUniqueStyles: allStyles,
+        allUniqueTags: allTags
     }
 };
 

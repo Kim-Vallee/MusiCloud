@@ -27,7 +27,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allTags,
+                    whitelist: allTags.map((tag) => tag.name),
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(","),
                 }),
@@ -41,7 +41,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allStyles,
+                    whitelist: allStyles.map((style) => style.name),
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(","),
                 }),
@@ -55,7 +55,7 @@
                     maxTags: 10,
                     dropdown: { enabled: 0, maxItems: 6 },
                     keepInvalidTags: false,
-                    whitelist: allAuthors,
+                    whitelist: allAuthors.map((author) => author.name),
                     originalInputValueFormat: (valuesArr) =>
                         valuesArr.map((item) => item.value).join(","),
                 }),

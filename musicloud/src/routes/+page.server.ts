@@ -55,9 +55,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         throw redirect(303, `/?${url.searchParams.toString()}`);
     }
 
-    const allTags = await getAllTags(isAuthenticated);
+    const allTags = getAllTags(isAuthenticated);
 
-    const allStyles = await getAllStyles(isAuthenticated);
+    const allStyles = getAllStyles(isAuthenticated);
 
     return {
         tracks: tracks,

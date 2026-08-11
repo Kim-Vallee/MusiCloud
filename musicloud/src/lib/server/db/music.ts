@@ -13,14 +13,14 @@ import { eq, like, desc, or, sql, exists, and, count, SQL } from "drizzle-orm";
 export type Track = {
     id: number;
     title: string;
-    authors: {id: number, name: string}[];
+    authors: { id: number, name: string }[];
     description?: string | null;
     uploadedAt?: Date | null;
     bpm?: number | null;
-    styles?: {id: number, name: string}[];
+    styles?: { id: number, name: string }[];
     hidden: boolean;
     setup?: string | null;
-    tags?: {id: number, name: string}[];
+    tags?: { id: number, name: string }[];
     audioFile: string;
     duration: number;
 };
@@ -134,6 +134,29 @@ export const getTracksWithQuery = async (
         pageSize,
         totalPages
     }
+}
+
+export const getAllAuthors = (
+    showHidden: boolean = false
+) => {
+    let sql_query = db.select().from(authors).$dynamic();
+
+    if (!showHidden) {
+        sql_query = sql_query.where(
+            exists(
+                db.select({ one: sql`1` })
+                    .from(musicAuthors)
+                    .innerJoin(music, eq(musicAuthors.musicId, music.id))
+                    .where(
+                        and(
+                            eq(musicAuthors.authorId, authors.id),
+                            eq(music.hidden, false)
+                        ))
+            )
+        );
+    }
+
+    return sql_query.all();
 }
 
 export const getAllTags = (
@@ -299,7 +322,7 @@ export const updateTrackById = async (id: number, input: {
 
 export const deleteTrackById = async (id: number) => {
     const track = await db.delete(music).where(eq(music.id, id)).returning();
-    
+
     return track[0] ?? null;
 
 }
