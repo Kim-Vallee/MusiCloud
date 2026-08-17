@@ -19,8 +19,12 @@
     let tagFilterInput: HTMLInputElement | undefined = $state(undefined);
     let styleFilterInput: HTMLInputElement | undefined = $state(undefined);
 
+    let allTracks = $derived(data.tracks);
     let allTags = $derived(data.allTags);
     let allStyles = $derived(data.allStyles);
+    let currentPage = $derived(data.currentPage);
+    let totalPages = $derived(data.totalPages);
+    let totalTracks = $derived(data.totalTracks);
 
     let searchInputClasses =
         "rounded-lg w-full border bg-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 py-3 px-4";
@@ -86,6 +90,15 @@
         trackToDelete = null;
     }
 
+    function goToPage(page: number) {
+        if (page < 1 || page > totalPages || page === currentPage) return;
+
+        const params = new URLSearchParams(window.location.search);
+        params.set("p", page.toString());
+
+        goto(`/?${params.toString()}`);
+    }
+
     onMount(() => {
         const instances: Array<{ destroy: () => void }> = [];
 
@@ -148,7 +161,9 @@
                     </div>
                 {/if}
             {/if}
-            <h1 class="text-3xl font-bold text-white mb-6"> <a href="/">MusiCloud</a></h1>
+            <h1 class="text-3xl font-bold text-white mb-6">
+                <a href="/">MusiCloud</a>
+            </h1>
 
             <div
                 class="rounded-2xl border border-gray-700 bg-gray-900/80 p-4 shadow-lg shadow-black/20"
@@ -245,7 +260,7 @@
                     Add track
                 </a>
             {/if}
-            {#each data.tracks as track (track.id)}
+            {#each allTracks as track (track.id)}
                 <div
                     class="bg-gray-800 rounded-lg border border-gray-700 hover:border-blue-500 transition-all hover:shadow-lg hover:shadow-blue-500/20 overflow-hidden group"
                     id="track-id-{track.id}"
@@ -271,7 +286,9 @@
                                     {track.title}
                                 </a>
                                 <p class="text-sm text-gray-400 truncate">
-                                    by { track.authors.map((author) => author.name).join(", ") }
+                                    by {track.authors
+                                        .map((author) => author.name)
+                                        .join(", ")}
                                 </p>
                             </div>
 
@@ -298,9 +315,9 @@
                                     <span class="text-gray-200"
                                         >{Math.floor(
                                             track.duration / 60,
-                                        )}:{Math.round(
-                                            track.duration % 60,
-                                        )}</span
+                                        )}:{Math.round(track.duration % 60)
+                                            .toString()
+                                            .padStart(2, "0")}</span
                                     >
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -485,6 +502,86 @@
                     </div>
                 </div>
             {/each}
+            {#if totalPages > 1}
+                <div class="flex flex-col items-center gap-3 py-6">
+                    <div class="text-sm text-gray-400">
+                        Showing page <span class="font-medium text-gray-200"
+                            >{currentPage}</span
+                        >
+                        of
+                        <span class="font-medium text-gray-200"
+                            >{totalPages}</span
+                        >
+                        ({totalTracks} tracks)
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button
+                            type="button"
+                            onclick={() => goToPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 px-3 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Previous page"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="size-4"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M15.75 19.5 8.25 12l7.5-7.5"
+                                />
+                            </svg>
+                        </button>
+
+                        {#each Array(totalPages) as _, i}
+                            {@const page = i + 1}
+
+                            <button
+                                type="button"
+                                onclick={() => goToPage(page)}
+                                class="inline-flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-medium transition-colors
+                        {page === currentPage
+                                    ? 'border-blue-500 bg-blue-600 text-white'
+                                    : 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'}"
+                                aria-current={page === currentPage
+                                    ? "page"
+                                    : undefined}
+                            >
+                                {page}
+                            </button>
+                        {/each}
+
+                        <button
+                            type="button"
+                            onclick={() => goToPage(currentPage + 1)}
+                            disabled={currentPage >= totalPages}
+                            class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 px-3 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label="Next page"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="size-4"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            {/if}
         </div>
     </div>
 

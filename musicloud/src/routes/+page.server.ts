@@ -62,6 +62,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     return {
         tracks: tracks,
         currentPage: current_page,
+        totalPages: totalPages,
+        totalTracks: total,
         allTags: allTags,
         allStyles: allStyles,
         isAuthenticated: isAuthenticated,
