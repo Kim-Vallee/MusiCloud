@@ -1,10 +1,14 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { AUDIO_DIR } from "$env/static/private";
 
 export const getAudioDir = (): string => {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    return path.resolve(__dirname, '..', 'lib', 'assets', 'audio');
+    const audioDir = AUDIO_DIR;
+
+    if (!audioDir) {
+        throw new Error('AUDIO_DIR env variable not defined');
+    }
+
+    return path.resolve(audioDir);
 };
 
 export const getAudioPath = (filename: string): string =>
