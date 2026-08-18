@@ -1,5 +1,7 @@
 # Musicloud
 
+A lightweight, self-hosted music portfolio built with SvelteKit and tailwindCSS.
+
 ## General information
 
 The idea behind this website is to create a lightweight alternative to soundcloud that would be self hosted as a sort of portfolio. It should have the following features:
@@ -48,19 +50,8 @@ The general methods to access the db are in `src/lib/server/db/filename.ts` wher
 
 ### Deploy
 
-First set the `.env` file with the following parameters:
-```
-# Drizzle
-DATABASE_URL=local.db
+In order to deploy copy or rename `.env.example` to `.env` and set the necessary values in the file.
 
-# Better-auth
-BETTER_AUTH_SECRET=my_super_secret
-BETTER_AUTH_URL=http://localhost:5173/
-
-GITHUB_CLIENT_ID=...
-GITHUB_CLIENT_SECRET=...
-```
-
-The better auth secret can be generated with the command `openssl rand -base64 32`. The better auth url should be changed according to the site as well.
+The better auth secret can be generated with the command `openssl rand -base64 32` and the better auth url should be changed according to your domain name as well.
 
 Look here to deploy the website: [adapter-node](https://svelte.dev/docs/kit/adapter-node).
