@@ -1,0 +1,12 @@
+name: Pull Request and Push checklist
+run-name: Testing pnpm install / check / test / build
+on: [push,pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v2
+      - run: pnpm check
+      - run: pnpm test
+      - run: pnpm build

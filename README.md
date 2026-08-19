@@ -97,6 +97,14 @@ A fast forward, but not recommended option is to use `pnpm run db:push` which ig
 
 The general methods to access the db are in `src/lib/server/db/music.ts`.
 
+### Testing
+
+Testing is done with [Vitest](https://svelte.dev/docs/svelte/testing). You can run the tests with:
+
+```bash
+pnpm run test
+```
+
 ### Deploy
 
 The standard procedure to deploy uses [adapter-node](https://svelte.dev/docs/kit/adapter-node).
