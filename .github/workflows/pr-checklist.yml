@@ -14,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/setup@v2
+      - run: pnpm run db:migrate
       - run: pnpm run check
       - run: pnpm run test
       - run: pnpm run build
