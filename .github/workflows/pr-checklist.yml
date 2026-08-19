@@ -13,9 +13,15 @@ jobs:
       CLIENT_SECRET_GITHUB: ${{ secrets.CLIENT_SECRET_GITHUB }}
       DATABASE_URL: ${{ vars.DATABASE_URL }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/setup@v2
-      - run: pnpm run db:migrate
-      - run: pnpm run check
-      - run: pnpm run test
-      - run: pnpm run build
+      - name: Checkout 
+        uses: actions/checkout@v7
+      - name: Setup pnpm 
+        uses: pnpm/setup@v2
+      - name: Migration
+        run: pnpm run db:migrate
+      - name: Type check
+        run: pnpm run check
+      - name: Run tests
+        run: pnpm run test
+      - name: Build
+        run: pnpm run build
