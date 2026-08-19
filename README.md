@@ -65,8 +65,8 @@ pnpm run dev
 | `BETTER_AUTH_SECRET` | Secret used by Better Auth | Yes |
 | `BETTER_AUTH_URL` | Public URL of the application used for the GitHub app | Yes |
 | `DATABASE_URL` | URL of the database (e.g. `database.db`) | Yes |
-| `GITHUB_CLIENT_ID` | Client ID of the GitHub app | Yes |
-| `GITHUB_CLIENT_SECRET` | Client secret of the Github app | Yes |
+| `CLIENT_ID_GITHUB` | Client ID of the GitHub app | Yes |
+| `CLIENT_SECRET_GITHUB` | Client secret of the Github app | Yes |
 | `AUDIO_DIR` | Absolute path to your audio files | Yes |
 | `PRODUCTION_HOST` | The host IP in production | Production only |
 | `PRODUCTION_PORT` | The port to use in production | Production only |

@@ -1,13 +1,13 @@
 import { getRequestEvent } from "$app/server";
 import { betterAuth } from "better-auth";
 import { sveltekitCookies } from "better-auth/svelte-kit";
-import { BETTER_AUTH_SECRET, BETTER_AUTH_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from "$env/static/private";
+import { BETTER_AUTH_SECRET, BETTER_AUTH_URL, CLIENT_ID_GITHUB, CLIENT_SECRET_GITHUB } from "$env/static/private";
 
 export const auth = betterAuth({
     socialProviders: {
         github: {
-            clientId: GITHUB_CLIENT_ID as string,
-            clientSecret: GITHUB_CLIENT_SECRET as string,
+            clientId: CLIENT_ID_GITHUB as string,
+            clientSecret: CLIENT_SECRET_GITHUB as string,
         },
     },
     plugins: [sveltekitCookies(getRequestEvent)],

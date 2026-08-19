@@ -7,6 +7,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/setup@v2
-      - run: pnpm check
-      - run: pnpm test
-      - run: pnpm build
+      - run: pnpm run check
+      - run: pnpm run test
+      - run: pnpm run build
