@@ -21,6 +21,8 @@ A lightweight, self-hosted music portfolio built with SvelteKit and tailwindCSS.
   </tr>
 </table>
 
+[Live demo](muzikaro.kimvallee.fr)
+
 ## General information
 
 This website is a lightweight self-hosted alternative to soundcloud and serves as a portfolio. It has the following features:
