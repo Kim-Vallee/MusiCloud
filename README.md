@@ -1,8 +1,25 @@
-# Musicloud
+# Musikaro
 
 A lightweight, self-hosted music portfolio built with SvelteKit and tailwindCSS.
 
-![Musicloud screenshot](static/musicloud_screenshot.png)
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Admin interface to Muzikaro</strong>
+    </td>
+    <td align="center" width="50%">
+      <strong>Visitor interface to Muzikaro</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="static/muzikaro_admin.png" alt="Muzikaro admin screenshot" width="100%">
+    </td>
+    <td align="center" width="50%">
+      <img src="static/muzikaro_base.png" alt="Muzikaro visitor screenshot" width="100%">
+    </td>
+  </tr>
+</table>
 
 ## General information
 
@@ -46,8 +63,8 @@ The app requires NodeJS, pnpm and ffprobe:
 In order to install and run the project and set up a [GitHub app](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps):
 
 ```bash
-git clone https://github.com/Kim-Vallee/MusiCloud.git
-cd musicloud
+git clone https://github.com/Kim-Vallee/Muzikaro.git
+cd Muzikaro
 pnpm install
 cp .env.example .env
 ```
@@ -122,4 +139,4 @@ If you want to make it a socket, refer to [this doc](https://svelte.dev/docs/kit
 
 ## License
 
-MusiCloud is released under the GPLv3 License. See [LICENSE](LICENSE) file.
+Muzikaro is released under the GPLv3 License. See [LICENSE](LICENSE) file.

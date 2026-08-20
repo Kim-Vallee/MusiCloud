@@ -162,7 +162,7 @@
                 {/if}
             {/if}
             <h1 class="text-3xl font-bold text-white mb-6">
-                <a href="/">MusiCloud</a>
+                <a href="/">Muzikaro</a>
             </h1>
 
             <div
