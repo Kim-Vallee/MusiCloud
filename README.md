@@ -1,4 +1,4 @@
-# Musikaro
+# Muzikaro
 
 A lightweight, self-hosted music portfolio built with SvelteKit and tailwindCSS.
 
