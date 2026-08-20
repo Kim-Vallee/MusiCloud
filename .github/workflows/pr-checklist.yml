@@ -4,7 +4,7 @@ on: [push,pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment: MusiCloud action variables
+    environment: Muzikaro
     env:
       AUDIO_DIR: ${{ vars.AUDIO_DIR }}
       BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
